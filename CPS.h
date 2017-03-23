@@ -1,4 +1,4 @@
-
+#include <string>
 
 class shape
 {
@@ -18,5 +18,22 @@ public:
 	int getPosY();
 
 	int getUnit();
+	~shape();
 
 };
+
+class circle : public shape
+{
+
+};
+
+class polygon : public shape
+{
+
+};
+
+class rectangle : public shape
+{
+
+};
+
