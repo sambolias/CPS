@@ -14,17 +14,22 @@ public:
 	int getHeight();
 	int getWidth();
 
-	int getPosX();
-	int getPosY();
-
 	int getUnit();
 	virtual ~shape() = default;
-
 };
-
+// triangle do polygon contrustor but do it for 3 sides 
 class circle : public shape
 {
+private : 
+	double _radius;
 
+public :
+	circle(double rad)
+	{
+		_radius = rad;
+	}
+	double getWidth();
+	double getHeight();
 };
 
 class polygon : public shape
