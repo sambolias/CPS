@@ -18,7 +18,7 @@ public:
 	int getPosY();
 
 	int getUnit();
-	~shape();
+	virtual ~shape() = default;
 
 };
 
