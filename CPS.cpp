@@ -1,11 +1,11 @@
 #include "CPS.h"
 
 
-int shape::getHeight()
+double shape::getHeight() const 
 {
 	return _height;
 }
-int shape::getWidth()
+double shape::getWidth() const
 {
 	return _width;
 }
@@ -59,19 +59,42 @@ void findAndReplace(string & s, string && find, string && replace)
 
 }
 
-string rectangle::getPostScript()
+string rectangle::getPostScript() const 
 {						//setting convention now that inch will needs to be defined in postscript file header
 	string ret = R"(
 		newpath
-		moveto
+		0 0 moveto
 		WIDTH 0 rlineto
 		0 HEIGHT rlineto
 		0 WIDTH sub 0 rlineto
 		closepath
 	)";
 
-	findAndReplace(ret, "WIDTH", to_string(getWidth()));
-	findAndReplace(ret, "HEIGHT", to_string(getHeight()));
+	findAndReplace(ret, "WIDTH", to_string( (int)getWidth() ));
+	findAndReplace(ret, "HEIGHT", to_string( (int)getHeight() ));
+
+	return ret;
+}
+
+rotated::rotated(const shape &s, double rotation) : _rotation(rotation), _postScript(s.getPostScript())
+{
+
+	setWidth(s.getWidth());
+	setHeight(s.getHeight());
+
+	//todo rotation trig with sin and cos
+
+}
+
+//this is much simpler because you just prefix the rotate command
+string rotated::getPostScript() const
+{
+	string ret;
+
+	ret = to_string( (int)_rotation);
+
+	ret += " rotate \n";
+	ret += _postScript;
 
 	return ret;
 }
@@ -86,6 +109,11 @@ int main()
 	rectangle rect(40,20);
 	cout<< "rectangle dimensions " <<rect.getWidth() << " by " << rect.getHeight() << endl;
 	cout<< rect.getPostScript() << endl;
+
+	rotated rot(rect, 90);
+
+	cout<< "rotated dimensions (not set up yet) " << rot.getWidth() << " by " << rot.getHeight() << endl;
+	cout<< rot.getPostScript() << endl;
 
 	return 0;
 }

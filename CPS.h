@@ -28,9 +28,9 @@ protected:
 
 public:
 
-	int getHeight();
-	int getWidth();
-	virtual string getPostScript(){}	//this needs to be =0 once derived classes all define it
+	double getHeight() const;
+	double getWidth() const;
+	virtual string getPostScript() const {}	//this needs to be =0 once derived classes all define it
 										//shape can be purely abstract class
 	virtual ~shape() = default;
 };
@@ -63,16 +63,18 @@ public:
 	double getSideLength();
 };
 
-//this is what i had in mind
-//it would be nice to have the ps file output set up 
-//for further testing
+//this is what i have in mind
+//see rotate 
+//for other multishape classes use translate before rotates
+//as far as I can tell this should work
+//test with ps files, now is the time to find errors
 class rectangle : public shape
 {
 
 public:
 	rectangle(double width, double height);
 
-	virtual string getPostScript() override;
+	virtual string getPostScript() const override;
 	
 };
 
@@ -102,17 +104,14 @@ class rotated : public shape
 private:
 
 	double _rotation;
-	shape subject;	//doing it this way all shapes need copy ctor
+	string _postScript;	
 
 public:
 
-	//rotated(const shape &s, double rotation);
+	rotated(const shape &s, double rotation);
 
-	//not sure how to make postscript here
-	//i think each postscript output needs to omit the moveto
-	//so that rotate can be done after
-	//might be easiest to just make file output functions
-	//to do some testing and find out how to get base classes set up properly
+	virtual string getPostScript() const override;
+
 };
 
 
