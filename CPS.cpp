@@ -78,11 +78,17 @@ string rectangle::getPostScript() const
 
 rotated::rotated(const shape &s, double rotation) : _rotation(rotation), _postScript(s.getPostScript())
 {
+	//need to limit to 90 degree intervals...or this could handle all rotations technically
 
-	setWidth(s.getWidth());
-	setHeight(s.getHeight());
+	const double pi = 3.1415926;
+	const double radians = _rotation * 2.0 * pi / 360.0;
 
-	//todo rotation trig with sin and cos
+	_origWidth = s.getWidth();
+	_origHeight = s.getHeight();
+
+	setWidth(abs(_origWidth * cos(radians) + _origHeight * sin(radians)));
+	setHeight(abs(_origHeight * cos(radians) + _origWidth * sin(radians)));
+
 
 }
 
@@ -110,7 +116,7 @@ int main()
 	cout<< "rectangle dimensions " <<rect.getWidth() << " by " << rect.getHeight() << endl;
 	cout<< rect.getPostScript() << endl;
 
-	rotated rot(rect, 90);
+	rotated rot(rect, 270);
 
 	cout<< "rotated dimensions (not set up yet) " << rot.getWidth() << " by " << rot.getHeight() << endl;
 	cout<< rot.getPostScript() << endl;

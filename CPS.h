@@ -1,7 +1,10 @@
 #ifndef CPS_H_INCLUDED
 #define CPS_H_INCLUDED
 
-
+#include <cmath>
+using std::sin;
+using std::cos;
+using std::abs;
 #include <string>
 using std::string;
 using std::to_string;
@@ -103,6 +106,7 @@ class rotated : public shape
 {
 private:
 
+	double _origWidth, _origHeight;
 	double _rotation;
 	string _postScript;	
 
