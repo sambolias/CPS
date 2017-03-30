@@ -47,8 +47,11 @@ public :
 	circle(double rad){
 	 _radius = rad;
 	}
-	double getWidth();
-	double getHeight();
+	double getWidth() const;
+	double getHeight() const;
+	double getRad() const;
+
+	virtual string getPostScript() const override;
 };
 
 class polygon : public shape

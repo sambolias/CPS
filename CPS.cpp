@@ -59,14 +59,26 @@ void findAndReplace(string & s, string && find, string && replace)
 
 }
 
+string circle::getPostScript() const
+{
+	string ret = R"(
+		newpath
+		4 inch 5.5 inch RAD inch 0 360 arc
+		closepath
+	)";
+	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
+
+	return ret;
+}
+
 string rectangle::getPostScript() const 
 {						//setting convention now that inch will needs to be defined in postscript file header
 	string ret = R"(
 		newpath
-		0 0 moveto
-		WIDTH 0 rlineto
-		0 HEIGHT rlineto
-		0 WIDTH sub 0 rlineto
+		4 inch 5.5 inch moveto
+		WIDTH inch 0 rlineto
+		0 HEIGHT inch rlineto
+		0 WIDTH inch sub 0 rlineto
 		closepath
 	)";
 
@@ -124,13 +136,17 @@ int main()
 	return 0;
 }
 
+double circle::getRad() const
+{
+	return _radius;
+}
 
-double circle::getWidth()
+double circle::getWidth() const
 {
 	return 2*_radius;
 }
 
-double circle::getHeight()
+double circle::getHeight() const
 {
 	return getWidth();
 }
