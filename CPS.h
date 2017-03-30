@@ -31,10 +31,9 @@ protected:
 
 public:
 
-	double getHeight() const;
-	double getWidth() const;
+	virtual double getHeight() const;
+	virtual double getWidth() const;
 	virtual string getPostScript() const {}	//this needs to be =0 once derived classes all define it
-										//shape can be purely abstract class
 	virtual ~shape() = default;
 };
 // triangle do polygon contrustor but do it for 3 sides 
@@ -46,9 +45,9 @@ private :
 public :
 	circle(double rad){
 	 _radius = rad;
+	 setWidth(rad*2);
+	 setHeight(rad*2);
 	}
-	double getWidth() const;
-	double getHeight() const;
 	double getRad() const;
 
 	virtual string getPostScript() const override;

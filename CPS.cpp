@@ -25,8 +25,6 @@ rectangle::rectangle(double width,double height)
 	setHeight(height);
 }
 
-
-
 //this probably needs a better place than global
 //but it is a nice way of setting postscript strings
 //size of replace must be < size of find
@@ -139,16 +137,6 @@ int main()
 double circle::getRad() const
 {
 	return _radius;
-}
-
-double circle::getWidth() const
-{
-	return 2*_radius;
-}
-
-double circle::getHeight() const
-{
-	return getWidth();
 }
 
 double polygon::getNumSides()
