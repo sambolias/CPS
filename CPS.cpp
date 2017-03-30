@@ -57,12 +57,15 @@ void findAndReplace(string & s, string && find, string && replace)
 
 }
 
+//note: I move the cursor to 4, 5.5 at the beginning of these just to get
+//it somewhere visible because 0,0 is the bottom left corner. We'll go back
+//and figure out where the cursor should go in relation to the center later.
+
 string circle::getPostScript() const
 {
 	string ret = R"(
 		newpath
 		4 inch 5.5 inch RAD 0 360 arc
-		closepath
 	)";
 	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
 
@@ -88,9 +91,39 @@ string rectangle::getPostScript() const
 
 string polygon::getPostScript() const
 {
+	int n = getNumSides();
+	double innerAngle = getInnerAngles();
+	double theta;
 
-	
+	//create an vector of x, y distances based on the angle from horizontal,
+	//which is cumulatively based on a single inner angle
+	vector<pair<double, double> > xyMoves (n - 1);
 
+
+	/*for(int i=1; i < n; ++i)
+	{
+		theta = innerAngle*i;
+		double x = 
+		xyMoves[i] = make_pair();
+	}*/
+
+
+
+	//polygons will start drawing at the bottom, since we know all
+	//polygons will have a horizontal bottom edge.
+	string ret = R"(
+		newpath
+		4 inch 5.5 inch moveto
+		0 SIDELENGTH rlineto
+		LOOPSTRING
+		closepath
+
+
+	)";
+
+	findAndReplace(ret, "SIDELENGTH", to_string( (int)getSideLength() ));
+
+	return ret;
 }
 
 rotated::rotated(const shape &s, double rotation) : _rotation(rotation), _postScript(s.getPostScript())
@@ -230,27 +263,27 @@ double polygon::calcInnerAngles()
 	return 180*(n - 2)/n;
 }
 
-double polygon::getInRad()
+double polygon::getInRad() const
 {
 	return _inRad;
 }
 
-double polygon::getCircumRad()
+double polygon::getCircumRad() const
 {
 	return _circumRad;
 }
 
-double polygon::getInnerAngles()
+double polygon::getInnerAngles() const
 {
 	return _innerAngles;
 }
 
-int polygon::getNumSides()
+int polygon::getNumSides() const
 {
 	return _numSides;
 }
 
-double polygon::getSideLength()
+double polygon::getSideLength() const
 {
 	return _sideLength;
 }

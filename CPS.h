@@ -13,6 +13,11 @@ using std::cout;
 using std::endl;
 #include <initializer_list>
 using std::initializer_list;
+#include <vector>
+using std::vector;
+#include <utility>
+using std::pair;
+using std::make_pair;
 
 const double  TRISIDES = 3.0;
 const double SQUARESIDES = 4.0;
@@ -80,12 +85,12 @@ public:
 	double calcWidth();
 	double calcInnerAngles();
 
-	int getNumSides();
-	double getSideLength(); 
-	double getInnerAngles();
+	int getNumSides() const;
+	double getSideLength() const; 
+	double getInnerAngles() const;
 
-	double getCircumRad();
-	double getInRad();
+	double getCircumRad() const;
+	double getInRad() const;
 
 	
 
