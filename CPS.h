@@ -14,8 +14,10 @@ using std::endl;
 #include <initializer_list>
 using std::initializer_list;
 
-double  TRISIDES = 3.0;
-double SQUARESIDES = 4.0;
+const double  TRISIDES = 3.0;
+const double SQUARESIDES = 4.0;
+
+const double PI = 4*atan(1);	//calculates pi to the machine's precision
 
 class shape
 {
@@ -50,22 +52,40 @@ public :
 	}
 	double getRad() const;
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 };
 
 class polygon : public shape
 {
 private:
-	double _numSides;
+	int _numSides;
 	double _sideLength;
+	double _circumRad, _inRad, _innerAngles;
 
 public:
 	polygon(double numSides, double sideLength){
-		_numSides = numSides;
+		_numSides = (int)numSides;
 		_sideLength = sideLength;
+		_circumRad = calcCircumRad();
+		_inRad = calcInRad();
+		_innerAngles = calcInnerAngles();
+		setHeight(calcHeight());
+		setWidth(calcWidth());
 	};
-	double getNumSides();
-	double getSideLength();
+	int getNumSides();
+	double getSideLength(); 
+
+	double calcCircumRad();
+	double calcInRad();
+
+	double getCircumRad();
+	double getInRad();
+
+	double calcHeight();
+	double calcWidth();
+	double calcInnerAngles();
+
+	string getPostScript() const override;
 };
 
 //this is what i have in mind
@@ -79,15 +99,12 @@ class rectangle : public shape
 public:
 	rectangle(double width, double height);
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 	
 };
 
 class triangle : public polygon
 {
-private:
-	double _numSides;
-	double _sideLength;
 public:
 
 	triangle(double numSides, double sideLength) : polygon(TRISIDES, sideLength){}

@@ -86,6 +86,14 @@ string rectangle::getPostScript() const
 	return ret;
 }
 
+string polygon::getPostScript() const
+{
+	
+
+	//
+
+}
+
 rotated::rotated(const shape &s, double rotation) : _rotation(rotation), _postScript(s.getPostScript())
 {
 	//need to limit to 90 degree intervals...or this could handle all rotations technically
@@ -139,7 +147,98 @@ double circle::getRad() const
 	return _radius;
 }
 
-double polygon::getNumSides()
+double polygon::calcCircumRad()
+{
+	//side length of an n-sided regular polygon with circumradius cr:
+	// L = 2*cr*sin(180/n)
+	//because we know l and n, solve that equation for cr: 
+	// cr = L/(2*sin(180/n))
+
+	return getSideLength() / (2*sin(180/getNumSides()));
+}
+
+double polygon::calcInRad()
+{
+	//inRad ir given sides, and circumRad cr:
+	// ir = cr*sin(pi/n)
+	//in the c'tor, calcCircumRad is called first.
+
+	return getCircumRad()*sin(PI/getNumSides());
+}
+
+double polygon::calcHeight()
+{
+	//if number of sides is odd, h = ir + cr
+	//if number of sides is even, h = cr*2
+
+	int sides = getNumSides();
+
+	if (sides%2 == 0)	//even # of sides
+	{
+		return getInRad() + getCircumRad();
+	}
+	else	//odd # of sides
+	{
+		return getCircumRad()*2;
+	}
+
+}
+
+double polygon::calcWidth()
+{
+	//for n=3, width is side length
+	//starting at n=4, every 4 polygons (8, 12, etc.) have width cr*2
+	//starting at n=6, every 4 polygons (10, 14, etc.) have width ir*2
+
+	//for the others, the width is the chord of the circular segment 
+	//between (n+1)/2 vertices. The angle for this segment is that
+	//number of vertices times 360/n (the angle subtening 1 chord, or side)
+	// chord length = 2*cr*sin(360/n*numVertices) 
+
+	int n = getNumSides();
+
+	if (n == 3)
+	{
+		return getSideLength();
+	}
+
+	else if (n % 4 == 0)
+	{
+		return getCircumRad()*2;
+	}
+
+	else if (n % 2 == 0)	//this also implies n % 4 != 0, because of the order
+	{
+		return getInRad()*2;
+	}
+
+	else	//n is odd and != 3
+	{
+		int numVertices = (n + 1)/2;
+		double theta = 360/n * numVertices;
+		return 2*getCircumRad()*sin(theta);
+	}
+	
+}
+
+double polygon::calcInnerAngles()
+{
+	//one of the inner angles of a polygon = (180*(n-2))/n
+	int n = getNumSides();
+	return 180*(n - 2)/n;
+}
+
+double polygon::getInRad()
+{
+	return _inRad;
+}
+
+double polygon::getCircumRad()
+{
+	return _circumRad;
+}
+
+int polygon::getNumSides()
 {
 	return _numSides;
 }
