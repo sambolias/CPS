@@ -66,24 +66,28 @@ public:
 	polygon(double numSides, double sideLength){
 		_numSides = (int)numSides;
 		_sideLength = sideLength;
-		_circumRad = calcCircumRad();
-		_inRad = calcInRad();
-		_innerAngles = calcInnerAngles();
+		_circumRad = calcCircumRad();	//radius of circle touching each vertex
+		_inRad = calcInRad();	//radius of circle tangent to each side
+		_innerAngles = calcInnerAngles();	//inner angle at each vertex
 		setHeight(calcHeight());
 		setWidth(calcWidth());
 	};
-	int getNumSides();
-	double getSideLength(); 
 
 	double calcCircumRad();
 	double calcInRad();
 
-	double getCircumRad();
-	double getInRad();
-
 	double calcHeight();
 	double calcWidth();
 	double calcInnerAngles();
+
+	int getNumSides();
+	double getSideLength(); 
+	double getInnerAngles();
+
+	double getCircumRad();
+	double getInRad();
+
+	
 
 	string getPostScript() const override;
 };

@@ -61,7 +61,7 @@ string circle::getPostScript() const
 {
 	string ret = R"(
 		newpath
-		4 inch 5.5 inch RAD inch 0 360 arc
+		4 inch 5.5 inch RAD 0 360 arc
 		closepath
 	)";
 	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
@@ -74,9 +74,9 @@ string rectangle::getPostScript() const
 	string ret = R"(
 		newpath
 		4 inch 5.5 inch moveto
-		WIDTH inch 0 rlineto
-		0 HEIGHT inch rlineto
-		0 WIDTH inch sub 0 rlineto
+		WIDTH 0 rlineto
+		0 HEIGHT rlineto
+		0 WIDTH sub 0 rlineto
 		closepath
 	)";
 
@@ -88,9 +88,8 @@ string rectangle::getPostScript() const
 
 string polygon::getPostScript() const
 {
-	
 
-	//
+	
 
 }
 
@@ -151,7 +150,7 @@ double polygon::calcCircumRad()
 {
 	//side length of an n-sided regular polygon with circumradius cr:
 	// L = 2*cr*sin(180/n)
-	//because we know l and n, solve that equation for cr: 
+	//because we know L and n, solve that equation for cr: 
 	// cr = L/(2*sin(180/n))
 
 	return getSideLength() / (2*sin(180/getNumSides()));
@@ -168,32 +167,35 @@ double polygon::calcInRad()
 
 double polygon::calcHeight()
 {
+	//note: the following statements assume flat side on the bottom
 	//if number of sides is odd, h = ir + cr
-	//if number of sides is even, h = cr*2
+	//if number of sides is even, h = ir*2
 
 	int sides = getNumSides();
 
 	if (sides%2 == 0)	//even # of sides
 	{
-		return getInRad() + getCircumRad();
+		return getInRad()*2;		
 	}
 	else	//odd # of sides
 	{
-		return getCircumRad()*2;
+		return getInRad() + getCircumRad();
 	}
 
 }
 
 double polygon::calcWidth()
 {
-	//for n=3, width is side length
-	//starting at n=4, every 4 polygons (8, 12, etc.) have width cr*2
-	//starting at n=6, every 4 polygons (10, 14, etc.) have width ir*2
+	//note: the following statements assume flat side on the bottom
 
-	//for the others, the width is the chord of the circular segment 
+	//for n=3, width is side length
+	//starting at n=4, every 4 polygons (8, 12, etc.) have width ir*2
+	//starting at n=6, every 4 polygons (10, 14, etc.) have width cr*2
+	
+	//for the odds, the width is the chord of the circular segment 
 	//between (n+1)/2 vertices. The angle for this segment is that
-	//number of vertices times 360/n (the angle subtening 1 chord, or side)
-	// chord length = 2*cr*sin(360/n*numVertices) 
+	//number of vertices times 360/n (the angle subtending a side)
+	// chord length = 2*cr*sin(360/n*numVertices) = width
 
 	int n = getNumSides();
 
@@ -204,12 +206,12 @@ double polygon::calcWidth()
 
 	else if (n % 4 == 0)
 	{
-		return getCircumRad()*2;
+		return getInRad()*2;
 	}
 
 	else if (n % 2 == 0)	//this also implies n % 4 != 0, because of the order
 	{
-		return getInRad()*2;
+		return getCircumRad()*2;
 	}
 
 	else	//n is odd and != 3
@@ -236,6 +238,11 @@ double polygon::getInRad()
 double polygon::getCircumRad()
 {
 	return _circumRad;
+}
+
+double polygon::getInnerAngles()
+{
+	return _innerAngles;
 }
 
 int polygon::getNumSides()
