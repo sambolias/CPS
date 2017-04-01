@@ -13,11 +13,6 @@ using std::cout;
 using std::endl;
 #include <initializer_list>
 using std::initializer_list;
-#include <vector>
-using std::vector;
-#include <utility>
-using std::pair;
-using std::make_pair;
 
 const double  TRISIDES = 3.0;
 const double SQUARESIDES = 4.0;
@@ -65,7 +60,7 @@ class polygon : public shape
 private:
 	int _numSides;
 	double _sideLength;
-	double _circumRad, _inRad, _innerAngles;
+	double _circumRad, _inRad, _innerAngle;
 
 public:
 	polygon(double numSides, double sideLength){
@@ -73,7 +68,7 @@ public:
 		_sideLength = sideLength;
 		_circumRad = calcCircumRad();	//radius of circle touching each vertex
 		_inRad = calcInRad();	//radius of circle tangent to each side
-		_innerAngles = calcInnerAngles();	//inner angle at each vertex
+		_innerAngle = calcInnerAngle();	//inner angle at each vertex
 		setHeight(calcHeight());
 		setWidth(calcWidth());
 	};
@@ -83,11 +78,11 @@ public:
 
 	double calcHeight();
 	double calcWidth();
-	double calcInnerAngles();
+	double calcInnerAngle();
 
 	int getNumSides() const;
 	double getSideLength() const; 
-	double getInnerAngles() const;
+	double getInnerAngle() const;
 
 	double getCircumRad() const;
 	double getInRad() const;

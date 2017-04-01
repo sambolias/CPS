@@ -91,37 +91,28 @@ string rectangle::getPostScript() const
 
 string polygon::getPostScript() const
 {
-	int n = getNumSides();
-	double innerAngle = getInnerAngles();
-	double theta;
-
-	//create an vector of x, y distances based on the angle from horizontal,
-	//which is cumulatively based on a single inner angle
-	vector<pair<double, double> > xyMoves (n - 1);
-
-
-	/*for(int i=1; i < n; ++i)
-	{
-		theta = innerAngle*i;
-		double x = 
-		xyMoves[i] = make_pair();
-	}*/
-
-
-
 	//polygons will start drawing at the bottom, since we know all
 	//polygons will have a horizontal bottom edge.
 	string ret = R"(
 		newpath
-		4 inch 5.5 inch moveto
-		0 SIDELENGTH rlineto
-		LOOPSTRING
+
+		144 144 moveto
+		1 1 SIDESMINUSONE{
+			SIDELENGTH 0 rlineto
+			ONE80MINUSANGLE rotate
+		} for
+
 		closepath
-
-
+		stroke
+		showpage
 	)";
 
-	findAndReplace(ret, "SIDELENGTH", to_string( (int)getSideLength() ));
+	double sidesminusone = getNumSides() - 1;
+	double one80minusangle = 180 - getInnerAngle();
+
+	findAndReplace(ret, "SIDELENGTH", to_string(getSideLength()));
+	findAndReplace(ret, "SIDESMINUSONE", to_string(sidesminusone));
+	findAndReplace(ret, "ONE80MINUSANGLE", to_string(one80minusangle));
 
 	return ret;
 }
@@ -256,7 +247,7 @@ double polygon::calcWidth()
 	
 }
 
-double polygon::calcInnerAngles()
+double polygon::calcInnerAngle()
 {
 	//one of the inner angles of a polygon = (180*(n-2))/n
 	int n = getNumSides();
@@ -273,9 +264,9 @@ double polygon::getCircumRad() const
 	return _circumRad;
 }
 
-double polygon::getInnerAngles() const
+double polygon::getInnerAngle() const
 {
-	return _innerAngles;
+	return _innerAngle;
 }
 
 int polygon::getNumSides() const
