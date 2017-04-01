@@ -99,7 +99,7 @@ string polygon::getPostScript() const
 		144 144 moveto
 		1 1 SIDESMINUSONE{
 			SIDELENGTH 0 rlineto
-			ONE80MINUSANGLE rotate
+			ROTATIONANGLE rotate
 		} for
 
 		closepath
@@ -108,11 +108,11 @@ string polygon::getPostScript() const
 	)";
 
 	double sidesminusone = getNumSides() - 1;
-	double one80minusangle = 180 - getInnerAngle();
+	double rotationangle = 180 - getInnerAngle();
 
 	findAndReplace(ret, "SIDELENGTH", to_string(getSideLength()));
 	findAndReplace(ret, "SIDESMINUSONE", to_string(sidesminusone));
-	findAndReplace(ret, "ONE80MINUSANGLE", to_string(one80minusangle));
+	findAndReplace(ret, "ROTATIONANGLE", to_string(rotationangle));
 
 	return ret;
 }
