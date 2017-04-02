@@ -17,6 +17,9 @@ using std::initializer_list;
 using std::vector;
 #include <fstream>
 using std::ofstream;
+#include <memory>
+using std::shared_ptr;
+using std::make_shared;
 
 const double  TRISIDES = 3.0;
 const double SQUARESIDES = 4.0;
@@ -155,9 +158,9 @@ private:
 
 public:
 
-	vertical(initializer_list<shape> shapes);
+	vertical(initializer_list<shared_ptr<shape>> shapes);
 
-	string getPostScript();
+	virtual string getPostScript() const override;
 
 };
 

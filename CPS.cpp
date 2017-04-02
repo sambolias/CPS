@@ -76,7 +76,7 @@ string rectangle::getPostScript() const
 {						//setting convention now that inch will needs to be defined in postscript file header
 	string ret = R"(
 		newpath
-		0 0 moveto
+		HALFW HALFH moveto
 		WIDTH 0 rlineto
 		0 HEIGHT rlineto
 		0 WIDTH sub 0 rlineto
@@ -85,6 +85,8 @@ string rectangle::getPostScript() const
 
 	findAndReplace(ret, "WIDTH", to_string( (int)getWidth() ));
 	findAndReplace(ret, "HEIGHT", to_string( (int)getHeight() ));
+	findAndReplace(ret, "HALFW", to_string( (int)-getWidth()/2.0 ));	//centers draw
+	findAndReplace(ret, "HALFH", to_string( (int)-getHeight()/2.0 ));
 
 	return ret;
 }
@@ -162,14 +164,20 @@ int main()
 	cout<< "rotated dimensions " << rot.getWidth() << " by " << rot.getHeight() << endl;
 	cout<< rot.getPostScript() << endl;
 
-//	having problem with init lists, this causes seg fault
-//	vertical vert{rect, rot, rect};
-//	cout<<vert.getPostScript() << endl;
+	cout<<"Testing vertical stack\n";
+
+	auto a = make_shared<rectangle> (40,20);
+	auto b = make_shared<rotated> (rect, 220);
+	auto c = make_shared<rectangle> (40,20);
+
+	vertical vert{b,a,b};
+	cout<<vert.getPostScript() << endl;
 
 	page test;
 	test.drawTo(rect, 2,2);
 	test.drawTo(rot, 4,4);
-	cout<<"draw shapes to page \n";
+	test.drawTo(vert, 2, 4);
+	cout<<"\ndraw shapes to page \n";
 	cout<<test.getPostScript() <<endl;
 
 
@@ -303,55 +311,53 @@ string draw(const shape &s, int x, int y)
 	string ret;
 
 	ret += "gsave \n";
-	ret += to_string( (int) x) + " inch " + to_string( (int) y) + " inch translate\n";
+	ret += to_string( (int) x) + "  " + to_string( (int) y) + "  translate\n";
 	ret += s.getPostScript();
 	ret += "\n stroke \n grestore \n";
 
 	return ret;
 }
 
-string vertStackOdd(const vector<shape> &shapes)
+string vertStackOdd(const vector<shared_ptr<shape>> &shapes)
 {
 	string ret;
 
 
-
 	int mid = shapes.size()/2;
 
-	int rtOffset = 0, ltOffset = 0;
+	int rtOffset = shapes[mid]->getWidth()/2.0, ltOffset = shapes[mid]->getWidth()/2.0;
 
 	//draw middle shape
-	ret = draw(shapes[mid], 0, 0);
+	ret = draw(*shapes[mid], 0, 0);
 
 	//draw surrounding shapes
-	for(int i = 0; i < mid; i++)
+	for(int i = 1; i <= mid; i++)
 	{
 
-		rtOffset += shapes[mid+i].getWidth()/2;
-		ltOffset += shapes[mid-i].getWidth()/2;
+		rtOffset += shapes[mid+i]->getWidth()/2.0;
+		ltOffset += shapes[mid-i]->getWidth()/2.0;
 
-		ret += draw(shapes[mid+i], rtOffset, 0);
-		ret += draw(shapes[mid-i], ltOffset, 0);		
+		ret += draw(*shapes[mid+i], rtOffset, 0);
+		ret += draw(*shapes[mid-i], -ltOffset, 0);		
 
-		rtOffset += shapes[mid+i].getWidth()/2;
-		ltOffset += shapes[mid-i].getWidth()/2;
+		rtOffset += shapes[mid+i]->getWidth()/2.0;
+		ltOffset += shapes[mid-i]->getWidth()/2.0;
 
 	}
 
 	return ret;
 }
 
-vertical::vertical(initializer_list<shape> shapes)
+vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 {
 	double sumWidth = 0, maxHeight = 0;
 
 	for(auto s : shapes)
 	{
-		cout<<"DEBUG: \n";
-		cout<<s.getPostScript()<<endl;
-		sumWidth += s.getWidth();
-		if(s.getHeight() > maxHeight)
-			maxHeight = s.getHeight();
+		
+		sumWidth += s->getWidth();
+		if(s->getHeight() > maxHeight)
+			maxHeight = s->getHeight();
 	}
 
 	setWidth(sumWidth);
@@ -364,7 +370,7 @@ vertical::vertical(initializer_list<shape> shapes)
 	{
 		//split an even in half to get 2 odds
 
-		auto midPtr = shapes.begin();
+/*		auto midPtr = shapes.begin();
 
 		midPtr = midPtr + shapes.size()/2;
 
@@ -372,21 +378,21 @@ vertical::vertical(initializer_list<shape> shapes)
   						 rights(midPtr, shapes.end());
 
 
-		_postScript = vertStackOdd(lefts) + vertStackOdd(rights);
+		_postScript = vertStackOdd(lefts) + vertStackOdd(rights);*/
 
 	}
 	else
 	{
 
-		vector<shape> list = shapes;
-		//cout<<list[1].getPostScript()<<endl;
-		_postScript = vertStackOdd(shapes);
+		vector<shared_ptr<shape>> list(shapes.begin(), shapes.end());
+
+		_postScript = vertStackOdd(list);
 	}
 
 
 }
 
-string vertical::getPostScript()
+string vertical::getPostScript() const
 {
 	return _postScript;
 }
@@ -399,7 +405,7 @@ void page::drawTo(const shape &s, int x, int y)
 	_postScript += "\n stroke \n grestore \n";
 }
 
-string page::getPostScript()
+string page::getPostScript() 
 { 
 	return _postScript;
 }
