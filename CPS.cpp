@@ -76,7 +76,7 @@ string rectangle::getPostScript() const
 {						//setting convention now that inch will needs to be defined in postscript file header
 	string ret = R"(
 		newpath
-		4 inch 5.5 inch moveto
+		0 0 moveto
 		WIDTH 0 rlineto
 		0 HEIGHT rlineto
 		0 WIDTH sub 0 rlineto
@@ -121,8 +121,8 @@ rotated::rotated(const shape &s, double rotation) : _rotation(rotation), _postSc
 {
 	//need to limit to 90 degree intervals...or this could handle all rotations technically
 
-	const double pi = 3.1415926;
-	const double radians = _rotation * 2.0 * pi / 360.0;
+	//const double pi = 3.1415926;
+	const double radians = _rotation * 2.0 * PI / 360.0;
 
 	_origWidth = s.getWidth();
 	_origHeight = s.getHeight();
@@ -159,8 +159,26 @@ int main()
 
 	rotated rot(rect, 270);
 
-	cout<< "rotated dimensions (not set up yet) " << rot.getWidth() << " by " << rot.getHeight() << endl;
+	cout<< "rotated dimensions " << rot.getWidth() << " by " << rot.getHeight() << endl;
 	cout<< rot.getPostScript() << endl;
+
+//	having problem with init lists, this causes seg fault
+//	vertical vert{rect, rot, rect};
+//	cout<<vert.getPostScript() << endl;
+
+	page test;
+	test.drawTo(rect, 2,2);
+	test.drawTo(rot, 4,4);
+	cout<<"draw shapes to page \n";
+	cout<<test.getPostScript() <<endl;
+
+
+	output of;
+	of.addPage(test);
+	cout<<"testing file output \n";
+	of.outputFile("test.ps");
+
+
 
 	return 0;
 }
@@ -277,4 +295,132 @@ int polygon::getNumSides() const
 double polygon::getSideLength() const
 {
 	return _sideLength;
+}
+
+//another global test function that needs moved eventually
+string draw(const shape &s, int x, int y)
+{
+	string ret;
+
+	ret += "gsave \n";
+	ret += to_string( (int) x) + " inch " + to_string( (int) y) + " inch translate\n";
+	ret += s.getPostScript();
+	ret += "\n stroke \n grestore \n";
+
+	return ret;
+}
+
+string vertStackOdd(const vector<shape> &shapes)
+{
+	string ret;
+
+
+
+	int mid = shapes.size()/2;
+
+	int rtOffset = 0, ltOffset = 0;
+
+	//draw middle shape
+	ret = draw(shapes[mid], 0, 0);
+
+	//draw surrounding shapes
+	for(int i = 0; i < mid; i++)
+	{
+
+		rtOffset += shapes[mid+i].getWidth()/2;
+		ltOffset += shapes[mid-i].getWidth()/2;
+
+		ret += draw(shapes[mid+i], rtOffset, 0);
+		ret += draw(shapes[mid-i], ltOffset, 0);		
+
+		rtOffset += shapes[mid+i].getWidth()/2;
+		ltOffset += shapes[mid-i].getWidth()/2;
+
+	}
+
+	return ret;
+}
+
+vertical::vertical(initializer_list<shape> shapes)
+{
+	double sumWidth = 0, maxHeight = 0;
+
+	for(auto s : shapes)
+	{
+		cout<<"DEBUG: \n";
+		cout<<s.getPostScript()<<endl;
+		sumWidth += s.getWidth();
+		if(s.getHeight() > maxHeight)
+			maxHeight = s.getHeight();
+	}
+
+	setWidth(sumWidth);
+	setHeight(maxHeight);
+
+
+
+
+	if(shapes.size()%2==0)	//even number of shapes
+	{
+		//split an even in half to get 2 odds
+
+		auto midPtr = shapes.begin();
+
+		midPtr = midPtr + shapes.size()/2;
+
+		vector<shape> lefts(shapes.begin(), midPtr ),
+  						 rights(midPtr, shapes.end());
+
+
+		_postScript = vertStackOdd(lefts) + vertStackOdd(rights);
+
+	}
+	else
+	{
+
+		vector<shape> list = shapes;
+		//cout<<list[1].getPostScript()<<endl;
+		_postScript = vertStackOdd(shapes);
+	}
+
+
+}
+
+string vertical::getPostScript()
+{
+	return _postScript;
+}
+
+void page::drawTo(const shape &s, int x, int y)
+{
+	_postScript += "gsave \n";
+	_postScript += to_string( (int) x) + " inch " + to_string( (int) y) + " inch translate\n";
+	_postScript += s.getPostScript();
+	_postScript += "\n stroke \n grestore \n";
+}
+
+string page::getPostScript()
+{ 
+	return _postScript;
+}
+
+void output::addPage(const page &p)
+{
+	pages.push_back(p);
+}
+
+void output::outputFile(string fname)
+{
+
+	ofstream ofs(fname);
+
+	ofs<<"%1 \n /inch {72 mul} def \n";
+
+	for(auto i : pages)
+	{
+		ofs<<i.getPostScript();
+		ofs<<" \n showpage \n";
+	}
+
+	ofs.close();
 }

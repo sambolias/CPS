@@ -13,6 +13,10 @@ using std::cout;
 using std::endl;
 #include <initializer_list>
 using std::initializer_list;
+#include <vector>
+using std::vector;
+#include <fstream>
+using std::ofstream;
 
 const double  TRISIDES = 3.0;
 const double SQUARESIDES = 4.0;
@@ -26,6 +30,7 @@ private:
 
 	double _height,_width;
 
+
 protected:
 
 	void setHeight(double height);
@@ -35,8 +40,8 @@ public:
 
 	virtual double getHeight() const;
 	virtual double getWidth() const;
-	virtual string getPostScript() const {}	//this needs to be =0 once derived classes all define it
-	virtual ~shape() = default;
+	virtual string getPostScript() const {}	//this needs to be =0 once derived classes all define it, or the string
+	virtual ~shape() = default;				//and function could be defined here for less repetition
 };
 // triangle do polygon contrustor but do it for 3 sides 
 class circle : public shape
@@ -123,7 +128,7 @@ public:
 
 };
 
-//i don't think there is any reason to have a compound shapes base class
+//compound shapes
 
 class rotated : public shape
 {
@@ -141,5 +146,53 @@ public:
 
 };
 
+class vertical : public shape
+{
+
+private:
+
+	string _postScript;
+
+public:
+
+	vertical(initializer_list<shape> shapes);
+
+	string getPostScript();
+
+};
+
+
+
+//file output interface
+
+class page
+{
+
+private:
+
+	string _postScript;
+
+public:
+
+
+	void drawTo(const shape &s, int x, int y);
+	string getPostScript();
+};
+
+class output
+{
+
+private:
+
+	string _postScript;
+	vector<page> pages;
+
+public:
+
+	void addPage(const page &p);
+
+	void outputFile(string fname);
+
+};
 
 #endif
