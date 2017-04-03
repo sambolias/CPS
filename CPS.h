@@ -43,7 +43,7 @@ public:
 
 	virtual double getHeight() const;
 	virtual double getWidth() const;
-	virtual string getPostScript() const {}	//this needs to be =0 once derived classes all define it, or the string
+	virtual string getPostScript() const { return ""; }	//this needs to be =0 once derived classes all define it, or the string
 	virtual ~shape() = default;				//and function could be defined here for less repetition
 };
 // triangle do polygon contrustor but do it for 3 sides 
@@ -119,8 +119,7 @@ class triangle : public polygon
 {
 public:
 
-	triangle(double numSides, double sideLength) : polygon(TRISIDES, sideLength){}
-
+	triangle(double numSides, double sideLength) : polygon(TRISIDES, sideLength) {};
 };
 
 class square : public polygon
@@ -164,7 +163,15 @@ public:
 
 };
 
-
+class layered : public shape
+{
+private:
+	string _postScript;
+public:
+	layered(initializer_list<shared_ptr<shape>> shapes);
+	
+	virtual string getPostScript() const override;
+};
 
 //file output interface
 

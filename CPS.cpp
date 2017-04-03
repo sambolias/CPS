@@ -105,7 +105,6 @@ string polygon::getPostScript() const
 		} for
 
 		closepath
-		stroke
 		showpage
 	)";
 
@@ -150,10 +149,14 @@ string rotated::getPostScript() const
 
 int main()
 {
-	triangle tri(5, 6.0);
-	square sq(5, 6.0);
-	std::cout << "triangle number of sides " <<tri.getNumSides() << "\n" << "triangle side length "  <<   tri.getSideLength() << std::endl;
-	std::cout << "square number of sides " << sq.getNumSides() << std::endl;
+	cout << "//////////" << "\n" << "layered postScript" << endl;
+	auto triLay = make_shared<triangle>(40, 20);
+	auto squareLay = make_shared<square>(10, 10);
+	cout << triLay->getPostScript() ;
+	layered lay{ triLay,squareLay };
+	cout << lay.getPostScript() << endl;
+	cout << "end of layerd input" << endl;
+
 
 	rectangle rect(40,20);
 	cout<< "rectangle dimensions " <<rect.getWidth() << " by " << rect.getHeight() << endl;
@@ -169,7 +172,7 @@ int main()
 	auto a = make_shared<rectangle> (40,20);
 	auto b = make_shared<rotated> (rect, 220);
 	auto c = make_shared<rectangle> (40,20);
-
+	
 	vertical vert{b,a,b};
 	cout<<vert.getPostScript() << endl;
 
@@ -311,7 +314,7 @@ string draw(const shape &s, int x, int y)
 	string ret;
 
 	ret += "gsave \n";
-	ret += to_string( (int) x) + "  " + to_string( (int) y) + "  translate\n";
+	ret += to_string( (int) x) + "  " + to_string( (int) y) + "  translate\n"; // translate might want to be moveto
 	ret += s.getPostScript();
 	ret += "\n stroke \n grestore \n";
 
@@ -392,11 +395,37 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 }
 
+layered::layered(initializer_list<shared_ptr<shape>> shapes)
+{
+	for (auto i : shapes) // go through all shapes find newHighest width and height of shapes set it to layered width or height
+	{
+		if (getWidth() < i->getWidth()) 
+		{
+			setWidth(i->getWidth());
+		}
+		if (getHeight() < i->getHeight())
+		{
+			setHeight(i->getHeight());
+		}
+		else{} // if not new tallest then go to next one
+		vector<shared_ptr<shape>> vecShapes(shapes.begin(), shapes.end());
+		string postSript;
+		for (int i = 0; i < vecShapes.size(); ++i)
+		{
+			postSript += draw(*vecShapes[i], getWidth(), getHeight());
+		}
+		_postScript = postSript;
+	}
+}
+
 string vertical::getPostScript() const
 {
 	return _postScript;
 }
-
+string layered::getPostScript() const
+{
+	return _postScript;
+}
 void page::drawTo(const shape &s, int x, int y)
 {
 	_postScript += "gsave \n";
@@ -417,16 +446,20 @@ void output::addPage(const page &p)
 
 void output::outputFile(string fname)
 {
-
 	ofstream ofs(fname);
-
+	ofs << "%%PS-Adobe-2.0" << "\n"; //
+	ofs << "%%Pages: " << pages.size() << "\n"; // sets up amount of pages total
 	ofs<<"%1 \n /inch {72 mul} def \n";
-
+	int pageNum = 1;
 	for(auto i : pages)
 	{
+		ofs << "%%Page: " << pageNum << " " << pageNum << "\n"; // as each object puts ps it will make a new corresponding page
 		ofs<<i.getPostScript();
 		ofs<<" \n showpage \n";
+		++pageNum;
 	}
 
 	ofs.close();
 }
+
+
