@@ -65,8 +65,8 @@ string circle::getPostScript() const
 		HALFW HALFH RAD 0 360 arc
 	)";
 
-	findAndReplace(ret, "HALFW", to_string( (int)getWidth() ));
-	findAndReplace(ret, "HALFH", to_string( (int)getHeight() ));
+	findAndReplace(ret, "HALFW", to_string( (int)getWidth()/2 ));
+	findAndReplace(ret, "HALFH", to_string( (int)getHeight()/2 ));
 	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
 
 	return ret;
@@ -109,8 +109,8 @@ string polygon::getPostScript() const
 	double sidesminusone = getNumSides() - 1;
 	double rotationangle = 180 - getInnerAngle();
 
-	findAndReplace(ret, "HALFW", to_string((int)getWidth() ));
-	findAndReplace(ret, "HALFH", to_string((int)getHeight() ));
+	findAndReplace(ret, "HALFW", to_string((int)getWidth()/2 ));
+	findAndReplace(ret, "HALFH", to_string((int)getHeight()/2 ));
 	findAndReplace(ret, "SIDELENGTH", to_string(getSideLength()));
 	findAndReplace(ret, "SIDESMINUSONE", to_string(sidesminusone));
 	findAndReplace(ret, "ROTATIONANGLE", to_string(rotationangle));
