@@ -57,16 +57,16 @@ void findAndReplace(string & s, string && find, string && replace)
 
 }
 
-//note: I move the cursor to 4, 5.5 at the beginning of these just to get
-//it somewhere visible because 0,0 is the bottom left corner. We'll go back
-//and figure out where the cursor should go in relation to the center later.
 
 string circle::getPostScript() const
 {
 	string ret = R"(
 		newpath
-		4 inch 5.5 inch RAD 0 360 arc
+		HALFW HALFH RAD 0 360 arc
 	)";
+
+	findAndReplace(ret, "HALFW", to_string( (int)getWidth() ));
+	findAndReplace(ret, "HALFH", to_string( (int)getHeight() ));
 	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
 
 	return ret;
@@ -97,20 +97,20 @@ string polygon::getPostScript() const
 	//polygons will have a horizontal bottom edge.
 	string ret = R"(
 		newpath
-
-		144 144 moveto
+		HALFW HALFH moveto
 		1 1 SIDESMINUSONE{
 			SIDELENGTH 0 rlineto
 			ROTATIONANGLE rotate
 		} for
 
 		closepath
-		showpage
 	)";
 
 	double sidesminusone = getNumSides() - 1;
 	double rotationangle = 180 - getInnerAngle();
 
+	findAndReplace(ret, "HALFW", to_string((int)getWidth() ));
+	findAndReplace(ret, "HALFH", to_string((int)getHeight() ));
 	findAndReplace(ret, "SIDELENGTH", to_string(getSideLength()));
 	findAndReplace(ret, "SIDESMINUSONE", to_string(sidesminusone));
 	findAndReplace(ret, "ROTATIONANGLE", to_string(rotationangle));
