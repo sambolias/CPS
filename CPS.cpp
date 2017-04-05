@@ -146,6 +146,34 @@ string rotated::getPostScript() const
 
 	return ret;
 }
+//scaled ctor takes a shape and double of scale you would like to apply to shape
+//sets height and width to the new scaled size of shape
+
+scaled::scaled(const shape & s, double xScale, double yScale)
+{
+	// get original height and width to multiply by x and y scale values
+	_origHeight = s.getHeight();
+	_origWidth = s.getWidth();
+	// save to private data members of xScale and yScale used in getPostScript
+	_xScale = xScale;
+	_yScale = yScale;
+	//set the width and height of this new shape to original values times the scales of x and y 
+	setWidth(_origWidth * xScale);
+	setHeight(_origHeight *  yScale);
+
+}
+// gets the postscript of the new scaled shape
+string scaled::getPostScript() const
+{
+	string ret = "";
+	ret += to_string((double)_xScale);
+	ret += " ";
+	ret += to_string((double)_yScale);
+	ret += " scale \n";
+	ret += _postScript;
+
+	return ret;
+}
 
 int main()
 {
@@ -158,6 +186,13 @@ int main()
 	cout << lay.getPostScript() << endl;
 	cout << "end of layerd input" << endl;
 
+	rectangle rectScale(20, 20);
+	cout << "we are goign to scale this rectangle" << endl;
+	cout << " current dimensions are: " << rectScale.getWidth() << " by " << rectScale.getHeight() << endl;
+	scaled sca(rectScale, 2.0, 1.0);
+
+	cout << "new dimensions are: " << sca.getWidth() << " by " << sca.getHeight() << endl;
+	cout << sca.getPostScript() << endl;
 
 	rectangle rect(40,20);
 	cout<< "rectangle dimensions " <<rect.getWidth() << " by " << rect.getHeight() << endl;
