@@ -395,27 +395,57 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 }
 
+string layerDraw(const shape &s, double x, double y)
+{
+	string ret;
+	// get half of the width to find how much we need to go to the left and down to start the drawing
+	double shapeX = s.getWidth() / 2.0;
+	double shapeY = s.getHeight() / 2.0;
+	// the values we got for the big box - the half the width and height to see where the center will be
+	// in realation for a smaller shape
+	//
+	x -= shapeX;
+	y -= shapeY;
+	ret += to_string((double)x) + "  " + to_string((double)y) + "  moveto\n"; // translate might want to be moveto
+	ret += s.getPostScript();
+	ret += "\n stroke \n grestore \n";
+
+	return ret;
+}
 layered::layered(initializer_list<shared_ptr<shape>> shapes)
 {
 	for (auto i : shapes) // go through all shapes find newHighest width and height of shapes set it to layered width or height
 	{
-		if (getWidth() < i->getWidth()) 
+		cout << " new  width of " << i->getWidth() << endl;
+		cout << " new  height of " << i->getHeight() << endl;
+		// get the biggest box made with the height and width of all the shapes
+		// this is needed to get a center point from which everything will be drawn around
+		if (getWidth() < i->getWidth())
 		{
-			setWidth(i->getWidth());
+			setWidth(i->getWidth()); // get biggest height to 
+			cout << " new biggest width of " << i->getWidth() << endl;
 		}
 		if (getHeight() < i->getHeight())
 		{
 			setHeight(i->getHeight());
+			cout << " new biggest height of " << i->getHeight() << endl;
 		}
-		else{} // if not new tallest then go to next one
-		vector<shared_ptr<shape>> vecShapes(shapes.begin(), shapes.end());
-		string postSript;
-		for (int i = 0; i < vecShapes.size(); ++i)
-		{
-			postSript += draw(*vecShapes[i], getWidth(), getHeight());
-		}
-		_postScript = postSript;
+		else {} // if not new tallest then go to next one
 	}
+	vector<shared_ptr<shape>> vecShapes(shapes.begin(), shapes.end());
+	string postSript;
+	double xCenterCord = getWidth() / 2.0; // we only need to go half way to reach the edge since were in the center
+	xCenterCord += 144;
+	double yCenterCord = getHeight() / 2.0;// do this for y cord as well
+	yCenterCord += 144;
+	// TODO find a value where we want to draw the shapes at because right now most are off the page like triangle
+	cout << "get width then height " << getWidth() << " " << getHeight() << endl;
+	cout << "center cords " << xCenterCord << " " << yCenterCord << endl;
+	for (int i = 0; i < vecShapes.size(); ++i)
+	{
+		postSript += layerDraw(*vecShapes[i], xCenterCord, yCenterCord); // these are the maxWidths and maxHeights of all the shapes in the list
+	}
+	_postScript = postSript;
 }
 
 string vertical::getPostScript() const
