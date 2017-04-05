@@ -152,6 +152,7 @@ int main()
 	cout << "//////////" << "\n" << "layered postScript" << endl;
 	auto triLay = make_shared<triangle>(40, 20);
 	auto squareLay = make_shared<square>(10, 10);
+	auto squar = make_shared<square>(20, 20);
 	cout << triLay->getPostScript() ;
 	layered lay{ triLay,squareLay };
 	cout << lay.getPostScript() << endl;
@@ -410,23 +411,6 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 }
 
-string layerDraw(const shape &s, double x, double y)
-{
-	string ret;
-	// get half of the width to find how much we need to go to the left and down to start the drawing
-	double shapeX = s.getWidth() / 2.0;
-	double shapeY = s.getHeight() / 2.0;
-	// the values we got for the big box - the half the width and height to see where the center will be
-	// in realation for a smaller shape
-	//
-	x -= shapeX;
-	y -= shapeY;
-	ret += to_string((double)x) + "  " + to_string((double)y) + "  moveto\n"; // translate might want to be moveto
-	ret += s.getPostScript();
-	ret += "\n stroke \n grestore \n";
-
-	return ret;
-}
 layered::layered(initializer_list<shared_ptr<shape>> shapes)
 {
 	for (auto i : shapes) // go through all shapes find newHighest width and height of shapes set it to layered width or height
@@ -454,11 +438,12 @@ layered::layered(initializer_list<shared_ptr<shape>> shapes)
 	double yCenterCord = getHeight() / 2.0;// do this for y cord as well
 	yCenterCord += 144;
 	// TODO find a value where we want to draw the shapes at because right now most are off the page like triangle
-	cout << "get width then height " << getWidth() << " " << getHeight() << endl;
-	cout << "center cords " << xCenterCord << " " << yCenterCord << endl;
+
 	for (int i = 0; i < vecShapes.size(); ++i)
 	{
-		postSript += layerDraw(*vecShapes[i], xCenterCord, yCenterCord); // these are the maxWidths and maxHeights of all the shapes in the list
+		yCenterCord -= vecShapes[i]->getHeight() / 2.0;
+		xCenterCord -= vecShapes[i]->getWidth() / 2.0;
+		postSript += draw(*vecShapes[i], xCenterCord, yCenterCord); // these are the maxWidths and maxHeights of all the shapes in the list
 	}
 	_postScript = postSript;
 }
