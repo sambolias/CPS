@@ -62,7 +62,7 @@ string circle::getPostScript() const
 {
 	string ret = R"(
 		newpath
-		HALFW HALFH RAD 0 360 arc
+		0 0 RAD 0 360 arc
 	)";
 
 	findAndReplace(ret, "HALFW", to_string( (int)-getWidth()/2 ));
@@ -172,14 +172,16 @@ int main()
 	auto a = make_shared<rectangle> (40,20);
 	auto b = make_shared<rotated> (rect, 220);
 	auto c = make_shared<rectangle> (40,20);
+	auto d = make_shared<circle>(20);
 	
-	vertical vert{b,a,b};
+	vertical vert{b,a,c,d,triLay,d};
 	cout<<vert.getPostScript() << endl;
 
 	page test;
 	test.drawTo(rect, 2,2);
 	test.drawTo(rot, 4,4);
 	test.drawTo(vert, 2, 4);
+	test.drawTo(lay, 2, 6);
 	cout<<"\ndraw shapes to page \n";
 	cout<<test.getPostScript() <<endl;
 
@@ -321,7 +323,7 @@ string draw(const shape &s, int x, int y)
 	return ret;
 }
 
-string vertStackOdd(const vector<shared_ptr<shape>> &shapes)
+string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
 {
 	string ret;
 
@@ -331,7 +333,7 @@ string vertStackOdd(const vector<shared_ptr<shape>> &shapes)
 	int rtOffset = shapes[mid]->getWidth()/2.0, ltOffset = shapes[mid]->getWidth()/2.0;
 
 	//draw middle shape
-	ret = draw(*shapes[mid], 0, 0);
+	ret = draw(*shapes[mid], offset, 0);
 
 	//draw surrounding shapes
 	for(int i = 1; i <= mid; i++)
@@ -340,8 +342,8 @@ string vertStackOdd(const vector<shared_ptr<shape>> &shapes)
 		rtOffset += shapes[mid+i]->getWidth()/2.0;
 		ltOffset += shapes[mid-i]->getWidth()/2.0;
 
-		ret += draw(*shapes[mid+i], rtOffset, 0);
-		ret += draw(*shapes[mid-i], -ltOffset, 0);		
+		ret += draw(*shapes[mid+i], rtOffset+offset, 0);
+		ret += draw(*shapes[mid-i], -ltOffset+offset, 0);		
 
 		rtOffset += shapes[mid+i]->getWidth()/2.0;
 		ltOffset += shapes[mid-i]->getWidth()/2.0;
@@ -373,15 +375,28 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 	{
 		//split an even in half to get 2 odds
 
-/*		auto midPtr = shapes.begin();
+		int lt=0,rt=0;
 
-		midPtr = midPtr + shapes.size()/2;
+		auto midPtr = shapes.begin()+ shapes.size()/2;
 
-		vector<shape> lefts(shapes.begin(), midPtr ),
+
+		vector<shared_ptr<shape>> lefts(shapes.begin(), midPtr ),
   						 rights(midPtr, shapes.end());
 
+  		for(int i = 0; i < (int)lefts.size()/2 + 1 ; i++)
+  		{
+  			rt += rights[i]->getWidth();
+  			lt -= lefts[lefts.size()-i-1]->getWidth();
 
-		_postScript = vertStackOdd(lefts) + vertStackOdd(rights);*/
+  			//bad form
+  			if(i == lefts.size()/2)
+  			{
+  				rt -= rights[i]->getWidth()/2;
+  				lt += lefts[lefts.size()-i-1]->getWidth()/2;
+  			}
+  		}
+
+		_postScript = vertStackOdd(lefts, lt) + vertStackOdd(rights, rt);
 
 	}
 	else
@@ -389,7 +404,7 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 		vector<shared_ptr<shape>> list(shapes.begin(), shapes.end());
 
-		_postScript = vertStackOdd(list);
+		_postScript = vertStackOdd(list, 0);
 	}
 
 
