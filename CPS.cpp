@@ -174,21 +174,31 @@ int main()
 	auto b = make_shared<rotated> (rect, 220);
 	auto c = make_shared<rectangle> (40,20);
 	auto d = make_shared<circle>(20);
+	auto s = make_shared<spacer>(40,40);
 	
-	vertical vert{b,a,c,d,triLay,d};
+	vertical vert{b,a,c,s,d,d,b};
 	cout<<vert.getPostScript() << endl;
 
+	horizontal hor{b,a,c,d,d};
+
+	layered l{a, b, d};
+
 	page test;
-	test.drawTo(rect, 2,2);
+	test.drawTo(rect, 4,2);
 	test.drawTo(rot, 4,4);
-	test.drawTo(vert, 2, 4);
-	test.drawTo(lay, 2, 6);
+	test.drawTo(vert, 2, 2);
+
+	page test2;
+	test2.drawTo(lay, 4, 6);
+	test2.drawTo(l, 2, 7);
+	test2.drawTo(hor, 2,4);
 	cout<<"\ndraw shapes to page \n";
-	cout<<test.getPostScript() <<endl;
+	//cout<<test.getPostScript() <<endl;
 
 
 	output of;
 	of.addPage(test);
+	of.addPage(test2);
 	cout<<"testing file output \n";
 	of.outputFile("test.ps");
 
@@ -331,6 +341,94 @@ string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
 
 	int mid = shapes.size()/2;
 
+	int upOffset = shapes[mid]->getHeight()/2.0, dnOffset = shapes[mid]->getHeight()/2.0;
+
+	//draw middle shape
+	ret = draw(*shapes[mid], 0, offset);
+
+	//draw surrounding shapes
+	for(int i = 1; i <= mid; i++)
+	{
+
+		upOffset += shapes[mid+i]->getHeight()/2.0;
+		dnOffset += shapes[mid-i]->getHeight()/2.0;
+
+		ret += draw(*shapes[mid+i],0, upOffset+offset);
+		ret += draw(*shapes[mid-i], 0,-dnOffset+offset);		
+
+		upOffset += shapes[mid+i]->getHeight()/2.0;
+		dnOffset += shapes[mid-i]->getHeight()/2.0;
+
+	}
+
+	return ret;
+}
+
+
+vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
+{
+	double maxWidth = 0, sumHeight = 0;
+
+	for(auto s : shapes)
+	{
+		
+		sumHeight += s->getHeight();
+		if(s->getWidth() > maxWidth)
+			maxWidth = s->getWidth();
+	}
+
+	setWidth(maxWidth);
+	setHeight(sumHeight);
+
+
+
+
+	if(shapes.size()%2==0)	//even number of shapes
+	{
+		//split an even in half to get 2 odds
+
+		int lt=0,rt=0;
+
+		auto midPtr = shapes.begin()+ shapes.size()/2;
+
+
+		vector<shared_ptr<shape>> lefts(shapes.begin(), midPtr ),
+  						 rights(midPtr, shapes.end());
+
+  		for(int i = 0; i < (int)lefts.size()/2 + 1 ; i++)
+  		{
+  			rt += rights[i]->getHeight();
+  			lt -= lefts[lefts.size()-i-1]->getHeight();
+
+  			//bad form
+  			if(i == lefts.size()/2)
+  			{
+  				rt -= rights[i]->getHeight()/2;
+  				lt += lefts[lefts.size()-i-1]->getHeight()/2;
+  			}
+  		}
+
+		_postScript = vertStackOdd(lefts, lt) + vertStackOdd(rights, rt);
+
+	}
+	else
+	{
+
+		vector<shared_ptr<shape>> list(shapes.begin(), shapes.end());
+
+		_postScript = vertStackOdd(list, 0);
+	}
+
+
+}
+
+string horStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
+{
+	string ret;
+
+
+	int mid = shapes.size()/2;
+
 	int rtOffset = shapes[mid]->getWidth()/2.0, ltOffset = shapes[mid]->getWidth()/2.0;
 
 	//draw middle shape
@@ -354,7 +452,7 @@ string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
 	return ret;
 }
 
-vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
+horizontal::horizontal(initializer_list<shared_ptr<shape>> shapes)
 {
 	double sumWidth = 0, maxHeight = 0;
 
@@ -397,7 +495,7 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
   			}
   		}
 
-		_postScript = vertStackOdd(lefts, lt) + vertStackOdd(rights, rt);
+		_postScript = horStackOdd(lefts, lt) + horStackOdd(rights, rt);
 
 	}
 	else
@@ -405,7 +503,7 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 		vector<shared_ptr<shape>> list(shapes.begin(), shapes.end());
 
-		_postScript = vertStackOdd(list, 0);
+		_postScript = horStackOdd(list, 0);
 	}
 
 
@@ -443,9 +541,15 @@ layered::layered(initializer_list<shared_ptr<shape>> shapes)
 	{
 		yCenterCord -= vecShapes[i]->getHeight() / 2.0;
 		xCenterCord -= vecShapes[i]->getWidth() / 2.0;
-		postSript += draw(*vecShapes[i], xCenterCord, yCenterCord); // these are the maxWidths and maxHeights of all the shapes in the list
+	//	postSript += draw(*vecShapes[i], xCenterCord, yCenterCord); // these are the maxWidths and maxHeights of all the shapes in the list
+		postSript += draw(*vecShapes[i], 0,0);	//check out my test with rects and circle, this way they are all centered
 	}
 	_postScript = postSript;
+}
+
+string horizontal::getPostScript() const
+{
+	return _postScript;
 }
 
 string vertical::getPostScript() const

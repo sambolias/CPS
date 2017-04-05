@@ -46,6 +46,19 @@ public:
 	virtual string getPostScript() const { return ""; }	//this needs to be =0 once derived classes all define it, or the string
 	virtual ~shape() = default;				//and function could be defined here for less repetition
 };
+
+class spacer : public shape
+{
+public:
+	spacer(double height, double width) 
+	{	
+		setHeight(height);
+		setWidth(width);
+	}
+
+	virtual string getPostScript() const override {return "";}	//this could also be left out if we use only one getPostScript fn
+};
+
 // triangle do polygon contrustor but do it for 3 sides 
 class circle : public shape
 {
@@ -158,6 +171,21 @@ private:
 public:
 
 	vertical(initializer_list<shared_ptr<shape>> shapes);
+
+	virtual string getPostScript() const override;
+
+};
+
+class horizontal : public shape
+{
+
+private:
+
+	string _postScript;
+
+public:
+
+	horizontal(initializer_list<shared_ptr<shape>> shapes);
 
 	virtual string getPostScript() const override;
 
