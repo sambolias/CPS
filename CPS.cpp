@@ -151,7 +151,7 @@ int main()
 {
 	cout << "//////////" << "\n" << "layered postScript" << endl;
 	auto triLay = make_shared<triangle>(40, 20);
-	auto squareLay = make_shared<square>(10, 10);
+	auto squareLay = make_shared<square>(20, 20);
 	auto squar = make_shared<square>(20, 20);
 	cout << triLay->getPostScript() ;
 	layered lay{ triLay,squareLay };
@@ -175,8 +175,9 @@ int main()
 	auto c = make_shared<rectangle> (40,20);
 	auto d = make_shared<circle>(20);
 	auto s = make_shared<spacer>(40,40);
+	auto p = make_shared<polygon>(5,30);
 	
-	vertical vert{b,a,c,s,d,d,b};
+	vertical vert{b,a,c,s,d,p,b};
 	cout<<vert.getPostScript() << endl;
 
 	horizontal hor{b,a,c,d,d};
@@ -219,7 +220,7 @@ double polygon::calcCircumRad()
 	//because we know L and n, solve that equation for cr: 
 	// cr = L/(2*sin(180/n))
 
-	return getSideLength() / (2*sin(180/getNumSides()));
+	return getSideLength() / (2*sin(PI/getNumSides()));
 }
 
 double polygon::calcInRad()
