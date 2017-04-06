@@ -160,7 +160,21 @@ public:
 	virtual string getPostScript() const override;
 
 };
+class scaled : public shape
+{
+private: 
 
+	double _origWidth, _origHeight;
+	double _xScale, _yScale;
+	string _postScript;
+
+public:
+
+	scaled(const shape & s, double xScale, double yScale); // takes 2 scales one for x one for y
+
+	virtual string getPostScript() const override;
+
+};
 class vertical : public shape
 {
 
