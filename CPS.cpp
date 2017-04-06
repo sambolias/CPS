@@ -149,7 +149,7 @@ string rotated::getPostScript() const
 //scaled ctor takes a shape and double of scale you would like to apply to shape
 //sets height and width to the new scaled size of shape
 
-scaled::scaled(const shape & s, double xScale, double yScale)
+scaled::scaled(const shape & s, double xScale, double yScale) : _postScript(s.getPostScript())
 {
 	// get original height and width to multiply by x and y scale values
 	_origHeight = s.getHeight();
