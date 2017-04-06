@@ -211,30 +211,41 @@ int main()
 	auto d = make_shared<circle>(20);
 	auto s = make_shared<spacer>(40,40);
 	auto p = make_shared<polygon>(5,30);
+	auto la = make_shared<layered>(initializer_list<shared_ptr<shape>>{a,b,d});
+	auto v2 = make_shared<vertical>(initializer_list<shared_ptr<shape>>{a,b,d,la,p});
 	
-	vertical vert{b,a,c,s,d,p,b};
+	vertical vert{b,a,c,s,d,p,la};
 	cout<<vert.getPostScript() << endl;
 
-	horizontal hor{b,a,c,d,d};
+	horizontal hor{b,a,c,d,d,v2};
 
 	layered l{a, b, d};
 
+	pixel pix(.5,.5,.5);
+
 	page test;
-	test.drawTo(rect, 4,2);
-	test.drawTo(rot, 4,4);
-	test.drawTo(vert, 2, 2);
+	test.drawTo(pix, 20,20);
+	test.drawTo(rect, 4*72,2*72);
+	test.drawTo(rot, 4*72,4*72);
+	test.drawTo(vert, 2*72, 2*72);
 
 	page test2;
-	test2.drawTo(lay, 4, 6);
-	test2.drawTo(l, 2, 7);
-	test2.drawTo(hor, 2,4);
+	test2.drawTo(lay, 4*72, 6*72);
+	test2.drawTo(l, 2*72, 7*72);
+	test2.drawTo(hor, 2*72,4*72);
 	cout<<"\ndraw shapes to page \n";
 	//cout<<test.getPostScript() <<endl;
 
 
+	mandelbrot mandle;
+
+	page test3;
+	test3.drawTo(mandle, 0,0);
+
 	output of;
 	of.addPage(test);
 	of.addPage(test2);
+	of.addPage(test3);
 	cout<<"testing file output \n";
 	of.outputFile("test.ps");
 
@@ -368,6 +379,44 @@ string draw(const shape &s, int x, int y)
 	ret += "\n stroke \n grestore \n";
 
 	return ret;
+}
+
+mandelbrot::mandelbrot()
+{
+	int wid = 72*8.5;
+	int ht = 72*11;
+
+	for(int y=0; y < ht; y+=1)
+	{
+		for(int x=0; x<wid; x+=1)
+		{
+	
+			float fx = x*(1.0 / wid), fy = y*(1.0 / ht);
+			float scale = 1.0; // amount of the mandelbrot set to draw
+			fx *= scale; fy *= scale;
+
+			float ci = fy, cr = fx; // complex constant: x,y coordinates
+			float zi = ci, zr = cr; // complex number to iterate
+			int iter;
+			for (iter = 0; iter<100; iter++) 
+			{
+				if (zi*zi + zr*zr>4.0) break; // number too big--stop iterating
+											  // z = z*z + c
+				float zr_new = zr*zr - zi*zi + cr;
+				float zi_new = 2 * zr*zi + ci;
+				zr = zr_new; zi = zi_new;
+			}
+
+			int r = zr/1.0;
+			int g = zi/2.0;
+			int b = 0;
+
+			pixel p(r, g, b);
+
+			_postScript += draw(p, x, y);
+		
+		}
+	}
 }
 
 string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
@@ -599,7 +648,7 @@ string layered::getPostScript() const
 void page::drawTo(const shape &s, int x, int y)
 {
 	_postScript += "gsave \n";
-	_postScript += to_string( (int) x) + " inch " + to_string( (int) y) + " inch translate\n";
+	_postScript += to_string( (int) x) + " " + to_string( (int) y) + " translate\n";
 	_postScript += s.getPostScript();
 	_postScript += "\n stroke \n grestore \n";
 }

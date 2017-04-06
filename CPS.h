@@ -59,6 +59,8 @@ public:
 	virtual string getPostScript() const override {return "";}	//this could also be left out if we use only one getPostScript fn
 };
 
+
+
 // triangle do polygon contrustor but do it for 3 sides 
 class circle : public shape
 {
@@ -113,6 +115,48 @@ public:
 	string getPostScript() const override;
 };
 
+
+class pixel : public shape
+{
+
+private:
+	string _postScript;
+
+public:
+	pixel(double r, double g, double b) 
+	{
+		//too many squares causes stack overflow
+		//polygon temp(4,2);
+		circle temp(1);
+		_postScript = temp.getPostScript();
+		_postScript += "\n" + to_string(r) + " " + to_string(g) + " " + to_string(b) + " setrgbcolor\n";
+		_postScript += "\nfill\n";
+	}
+
+	string getPostScript() const override
+	{
+		return _postScript;
+	}
+
+};
+
+class mandelbrot : public shape
+{
+
+private:
+
+	string _postScript;
+
+public:
+
+	mandelbrot();
+
+	string getPostScript() const override
+	{
+		return _postScript;
+	}
+
+};
 //this is what i have in mind
 //see rotate 
 //for other multishape classes use translate before rotates
