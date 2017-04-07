@@ -610,18 +610,22 @@ void testShapes(void)
 	stdShapes.drawTo(rec1, 40, 40);
 	stdShapes.drawTo(sq1, 100, 100);
 	stdShapes.drawTo(circ1, 200, 200);
-	stdShapes.drawTo(tri, 200, 320);
+	stdShapes.drawTo(tri, 250, 200);
 	stdShapes.drawTo(penta, 144, 144);
 
 	rectangle rect(40, 20);
 	rotated rot(tri, 270);
+	rotated rotPent(penta, 15);
 	scaled sca(rect, 3, 2);
 	scaled scaCirc(circ1, 2, 1);
+
 	// are scaled and roated shapes showing off
 	page scaledRotatedShapes;
 	scaledRotatedShapes.drawTo(rot, 60, 60);
 	scaledRotatedShapes.drawTo(tri, 144, 144);
 	scaledRotatedShapes.drawTo(scaCirc, 180, 180);
+	scaledRotatedShapes.drawTo(sca, 220, 100);
+	scaledRotatedShapes.drawTo(rotPent, 220, 40);
 
 	auto a = make_shared<rectangle>(40, 20);
 	auto b = make_shared<rotated>(rect, 220);
@@ -636,19 +640,24 @@ void testShapes(void)
 	layered l{ a, b, d };
 	auto triLay = make_shared<triangle>(40, 50);
 	auto squareLay = make_shared<square>(20, 20);
-	auto squar = make_shared<square>(20, 20);
-	layered lay{ triLay,squareLay };
+	auto circleLay = make_shared<circle>(20);
+	layered lay{ triLay,squareLay,circleLay };
 
 	//page to hold all of our compounded shapes test
 	page compundedShapes;
 	compundedShapes.drawTo(lay, 144, 144);
-	compundedShapes.drawTo(vert, 60, 40);
+	compundedShapes.drawTo(vert, 60, 140);
 	compundedShapes.drawTo(hor, 120, 320);
+
+	//mandelbrot man;
+	page customShape;
+	//customShape.drawTo(man, 144, 144);
 
 	output of;
 	of.addPage(stdShapes);
 	of.addPage(scaledRotatedShapes);
 	of.addPage(compundedShapes);
+	//of.addPage(customShape);
 	of.outputFile("test.ps");
 }
 
