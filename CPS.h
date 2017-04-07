@@ -29,6 +29,7 @@ const double PI = 4*atan(1);	//calculates pi to the machine's precision
 class shape
 {
 
+
 private:
 
 	double _height,_width;
@@ -38,13 +39,15 @@ protected:
 
 	void setHeight(double height);
 	void setWidth(double width);
-
+	string draw(const shape &s, int x, int y);
+	//this function is global, won't compile as member function
+	//void findAndReplace(string & s, string && find, string && replace);
 public:
 
 	virtual double getHeight() const;
 	virtual double getWidth() const;
-	virtual string getPostScript() const { return ""; }	//this needs to be =0 once derived classes all define it, or the string
-	virtual ~shape() = default;				//and function could be defined here for less repetition
+	virtual string getPostScript() const =0;
+	virtual ~shape() = default;				
 };
 
 class spacer : public shape
@@ -56,7 +59,7 @@ public:
 		setWidth(width);
 	}
 
-	virtual string getPostScript() const override {return "";}	//this could also be left out if we use only one getPostScript fn
+	string getPostScript() const override;
 };
 
 
@@ -149,7 +152,7 @@ private:
 
 public:
 
-	mandelbrot();
+	mandelbrot(int width, int height);
 
 	string getPostScript() const override
 	{
@@ -157,11 +160,8 @@ public:
 	}
 
 };
-//this is what i have in mind
-//see rotate 
-//for other multishape classes use translate before rotates
-//as far as I can tell this should work
-//test with ps files, now is the time to find errors
+
+
 class rectangle : public shape
 {
 
@@ -201,7 +201,7 @@ public:
 
 	rotated(const shape &s, double rotation);
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 
 };
 class scaled : public shape
@@ -216,7 +216,7 @@ public:
 
 	scaled(const shape & s, double xScale, double yScale); // takes 2 scales one for x one for y
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 
 };
 class vertical : public shape
@@ -225,12 +225,12 @@ class vertical : public shape
 private:
 
 	string _postScript;
-
+	string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset);
 public:
 
 	vertical(initializer_list<shared_ptr<shape>> shapes);
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 
 };
 
@@ -240,12 +240,12 @@ class horizontal : public shape
 private:
 
 	string _postScript;
-
+	string horStackOdd(const vector<shared_ptr<shape>> &shapes, int offset);
 public:
 
 	horizontal(initializer_list<shared_ptr<shape>> shapes);
 
-	virtual string getPostScript() const override;
+	string getPostScript() const override;
 
 };
 

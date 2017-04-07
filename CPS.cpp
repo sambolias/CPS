@@ -25,8 +25,8 @@ rectangle::rectangle(double width,double height)
 	setHeight(height);
 }
 
-//this probably needs a better place than global
-//but it is a nice way of setting postscript strings
+//last global non-test function
+//nice way of setting postscript strings
 //size of replace must be < size of find
 void findAndReplace(string & s, string && find, string && replace)
 {
@@ -73,7 +73,7 @@ string circle::getPostScript() const
 }
 
 string rectangle::getPostScript() const 
-{						//setting convention now that inch will needs to be defined in postscript file header
+{						
 	string ret = R"(
 		newpath
 		HALFW HALFH moveto
@@ -145,6 +145,11 @@ string rotated::getPostScript() const
 	ret += _postScript;
 
 	return ret;
+}
+
+string spacer::getPostScript() const
+{
+	return "";
 }
 //scaled ctor takes a shape and double of scale you would like to apply to shape
 //sets height and width to the new scaled size of shape
@@ -290,7 +295,7 @@ double polygon::getSideLength() const
 }
 
 //another global test function that needs moved eventually
-string draw(const shape &s, int x, int y)
+string shape::draw(const shape &s, int x, int y)
 {
 	string ret;
 
@@ -302,15 +307,17 @@ string draw(const shape &s, int x, int y)
 	return ret;
 }
 
-mandelbrot::mandelbrot()
+mandelbrot::mandelbrot(int width, int height )
 {
-	int wid = 72*8.5;
-	int ht = 72*11;
+	int ht = height;
+	int wid = width;
 
 	for(int y=0; y < ht; y+=1)
 	{
 		for(int x=0; x<wid; x+=1)
 		{
+			//this code is taken from Dr. Lawlor's assembly 301 class
+			//the math is still a bit beyond me
 	
 			float fx = x*(1.0 / wid), fy = y*(1.0 / ht);
 			float scale = 1.0; // amount of the mandelbrot set to draw
@@ -328,6 +335,8 @@ mandelbrot::mandelbrot()
 				zr = zr_new; zi = zi_new;
 			}
 
+			////////////////////////////////////////////////////////////
+
 			int r = zr/1.0;
 			int g = zi/2.0;
 			int b = 0;
@@ -340,7 +349,7 @@ mandelbrot::mandelbrot()
 	}
 }
 
-string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
+string vertical::vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
 {
 	string ret;
 
@@ -428,7 +437,7 @@ vertical::vertical(initializer_list<shared_ptr<shape>> shapes)
 
 }
 
-string horStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
+string horizontal::horStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
 {
 	string ret;
 
@@ -648,15 +657,18 @@ void testShapes(void)
 	compundedShapes.drawTo(vert, 60, 140);
 	compundedShapes.drawTo(hor, 120, 320);
 
-	//mandelbrot man;
+	//ctor args are width and height
+	//if this causes a stack overflow
+	//on other machines make it smaller
+	mandelbrot man(72*8.5, 72*11);
 	page customShape;
-	//customShape.drawTo(man, 144, 144);
+	customShape.drawTo(man, 0, 0);
 
 	output of;
 	of.addPage(stdShapes);
 	of.addPage(scaledRotatedShapes);
 	of.addPage(compundedShapes);
-	//of.addPage(customShape);
+	of.addPage(customShape);
 	of.outputFile("test.ps");
 }
 
@@ -725,7 +737,7 @@ void developmentTest(void)
 	//cout<<test.getPostScript() <<endl;
 
 
-	mandelbrot mandle;
+	mandelbrot mandle(72*8.5, 72*11);
 
 	page test3;
 	test3.drawTo(mandle, 0, 0);
