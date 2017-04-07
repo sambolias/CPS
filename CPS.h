@@ -46,36 +46,29 @@ public:
 
 	virtual double getHeight() const;
 	virtual double getWidth() const;
-	virtual string getPostScript() const =0;
+	virtual string getPostScript() const = 0;
 	virtual ~shape() = default;				
 };
 
 class spacer : public shape
 {
 public:
-	spacer(double height, double width) 
-	{	
-		setHeight(height);
-		setWidth(width);
-	}
+	spacer(double height, double width);
 
 	string getPostScript() const override;
 };
 
 
 
-// triangle do polygon contrustor but do it for 3 sides 
+// for triangle, do polygon contructor but do it for 3 sides 
 class circle : public shape
 {
 private : 
 	double _radius;
 
 public :
-	circle(double rad){
-	 _radius = rad;
-	 setWidth(rad*2);
-	 setHeight(rad*2);
-	}
+	circle(double rad);
+
 	double getRad() const;
 
 	string getPostScript() const override;
@@ -89,15 +82,7 @@ private:
 	double _circumRad, _inRad, _innerAngle;
 
 public:
-	polygon(double numSides, double sideLength){
-		_numSides = (int)numSides;
-		_sideLength = sideLength;
-		_circumRad = calcCircumRad();	//radius of circle touching each vertex
-		_inRad = calcInRad();	//radius of circle tangent to each side
-		_innerAngle = calcInnerAngle();	//inner angle at each vertex
-		setHeight(calcHeight());
-		setWidth(calcWidth());
-	};
+	polygon(double numSides, double sideLength);
 
 	double calcCircumRad();
 	double calcInRad();
@@ -126,20 +111,9 @@ private:
 	string _postScript;
 
 public:
-	pixel(double r, double g, double b) 
-	{
-		//too many squares causes stack overflow
-		//polygon temp(4,2);
-		circle temp(1);
-		_postScript = temp.getPostScript();
-		_postScript += "\n" + to_string(r) + " " + to_string(g) + " " + to_string(b) + " setrgbcolor\n";
-		_postScript += "\nfill\n";
-	}
+	pixel(double r, double g, double b);
 
-	string getPostScript() const override
-	{
-		return _postScript;
-	}
+	string getPostScript() const override;
 
 };
 
@@ -154,10 +128,7 @@ public:
 
 	mandelbrot(int width, int height);
 
-	string getPostScript() const override
-	{
-		return _postScript;
-	}
+	string getPostScript() const override;
 
 };
 
@@ -214,7 +185,7 @@ private:
 
 public:
 
-	scaled(const shape & s, double xScale, double yScale); // takes 2 scales one for x one for y
+	scaled(const shape & s, double xScale, double yScale); // takes 2 scales: one for x, one for y
 
 	string getPostScript() const override;
 
