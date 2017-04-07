@@ -65,9 +65,9 @@ string circle::getPostScript() const
 		0 0 RAD 0 360 arc
 	)";
 
-	findAndReplace(ret, "HALFW", to_string( (int)-getWidth()/2 ));
-	findAndReplace(ret, "HALFH", to_string( (int)-getHeight()/2 ));
-	findAndReplace(ret, "RAD", to_string( (int)getRad() ));
+	findAndReplace(ret, "HALFW", to_string( -getWidth()/2 ));
+	findAndReplace(ret, "HALFH", to_string( -getHeight()/2 ));
+	findAndReplace(ret, "RAD", to_string( getRad() ));
 
 	return ret;
 }
@@ -83,10 +83,10 @@ string rectangle::getPostScript() const
 		closepath
 	)";
 
-	findAndReplace(ret, "WIDTH", to_string( (int)getWidth() ));
-	findAndReplace(ret, "HEIGHT", to_string( (int)getHeight() ));
-	findAndReplace(ret, "HALFW", to_string( (int)-getWidth()/2.0 ));	//centers draw
-	findAndReplace(ret, "HALFH", to_string( (int)-getHeight()/2.0 ));
+	findAndReplace(ret, "WIDTH", to_string( getWidth() ));
+	findAndReplace(ret, "HEIGHT", to_string( getHeight() ));
+	findAndReplace(ret, "HALFW", to_string( -getWidth()/2.0 ));	//centers draw
+	findAndReplace(ret, "HALFH", to_string( -getHeight()/2.0 ));
 
 	return ret;
 }
@@ -295,7 +295,7 @@ string draw(const shape &s, int x, int y)
 	string ret;
 
 	ret += "gsave \n";
-	ret += to_string( (int) x) + "  " + to_string( (int) y) + "  translate\n"; // translate might want to be moveto
+	ret += to_string(  x) + "  " + to_string( y) + "  translate\n"; // translate might want to be moveto
 	ret += s.getPostScript();
 	ret += "\n stroke \n grestore \n";
 
@@ -565,7 +565,7 @@ string layered::getPostScript() const
 void page::drawTo(const shape &s, int x, int y)
 {
 	_postScript += "gsave \n";
-	_postScript += to_string( (int) x) + " " + to_string( (int) y) + " translate\n";
+	_postScript += to_string( x) + " " + to_string( y) + " translate\n";
 	_postScript += s.getPostScript();
 	_postScript += "\n stroke \n grestore \n";
 }
