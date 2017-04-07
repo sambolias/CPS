@@ -307,8 +307,8 @@ double polygon::calcWidth()
 	
 	//for the odds, the width is the chord of the circular segment 
 	//between (n+1)/2 vertices. The angle for this segment is that
-	//number of vertices times 360/n (the angle subtending a side)
-	// chord length = 2*cr*sin(360/n*numVertices) = width
+	//number-1 sides times 360/n (the angle subtending a side)
+	// chord length = 2*cr*sin(360/n*(numVertices-1)) = width
 
 	int n = getNumSides();
 
@@ -330,8 +330,8 @@ double polygon::calcWidth()
 	else	//n is odd and != 3
 	{
 		int numVertices = (n + 1)/2;
-		double theta = 360/n * numVertices;
-		return 2*getCircumRad()*sin(theta);
+		double theta = 360/n * (numVertices-1);
+		return 2*getCircumRad()*sin(theta * PI/180);
 	}
 	
 }
