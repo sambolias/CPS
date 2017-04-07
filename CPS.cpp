@@ -97,7 +97,7 @@ string polygon::getPostScript() const
 	//polygons will have a horizontal bottom edge.
 	string ret = R"(
 		newpath
-		HALFW HALFH moveto
+		XDRAW YDRAW moveto
 		1 1 SIDESMINUSONE{
 			SIDELENGTH 0 rlineto
 			ROTATIONANGLE rotate
@@ -109,8 +109,8 @@ string polygon::getPostScript() const
 	double sidesminusone = getNumSides() - 1;
 	double rotationangle = 180 - getInnerAngle();
 
-	findAndReplace(ret, "HALFW", to_string((int)-getWidth()/2 ));
-	findAndReplace(ret, "HALFH", to_string((int)-getHeight()/2 ));
+	findAndReplace(ret, "XDRAW", to_string(-getSideLength()/2));	//centering
+	findAndReplace(ret, "YDRAW", to_string(-getHeight()/2));
 	findAndReplace(ret, "SIDELENGTH", to_string(getSideLength()));
 	findAndReplace(ret, "SIDESMINUSONE", to_string(sidesminusone));
 	findAndReplace(ret, "ROTATIONANGLE", to_string(rotationangle));
@@ -635,7 +635,7 @@ void testShapes(void)
 	auto p = make_shared<polygon>(5, 30);
 
 	// vertical horizontal and layered objects
-	vertical vert{ b,a,c,s,d,p,b };
+	vertical vert{ b,a,c,s,d,p,d };
 	horizontal hor{ b,a,c,d,d };
 	layered l{ a, b, d };
 	auto triLay = make_shared<triangle>(40, 50);
