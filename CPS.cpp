@@ -196,7 +196,7 @@ double polygon::calcInRad()
 	// ir = cr*cos(pi/n)
 	//in the c'tor, calcCircumRad is called first.
 
-	return getCircumRad()*cos(PI/getNumSides() * PI/180);
+	return getCircumRad()*cos(PI/getNumSides());
 }
 
 double polygon::calcHeight()
