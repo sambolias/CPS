@@ -605,6 +605,7 @@ void output::outputFile(string fname)
 	}
 
 	ofs.close();
+	cout<<"Output Successful\n";
 }
 
 void testShapes(void)
@@ -645,7 +646,16 @@ void testShapes(void)
 	// vertical horizontal and layered objects
 	vertical vert{ b,a,c,s,d,p,d };
 	horizontal hor{ b,a,d,p,d };
-	layered l{ a, b, d };
+
+	//heavy compound shape example
+	auto la = make_shared<layered>(initializer_list<shared_ptr<shape>>{b, d});
+	auto v2 = make_shared<vertical>(initializer_list<shared_ptr<shape>>{b, d, la});
+	auto sl = make_shared<scaled>(rotPent, 3, 3);
+	auto hl = make_shared<layered>(initializer_list<shared_ptr<shape>>{d,sl,v2});
+	auto compound = make_shared<horizontal>(initializer_list<shared_ptr<shape>>{a,p,hl});
+	rotated r(*compound, 45);
+	
+
 	auto triLay = make_shared<triangle>(40, 50);
 	auto squareLay = make_shared<square>(20, 20);
 	auto circleLay = make_shared<circle>(20);
@@ -656,6 +666,7 @@ void testShapes(void)
 	compundedShapes.drawTo(lay, 144, 144);
 	compundedShapes.drawTo(vert, 60, 140);
 	compundedShapes.drawTo(hor, 120, 320);
+	compundedShapes.drawTo(r, 150, 500);
 
 	//ctor args are width and height
 	//if this causes a stack overflow
