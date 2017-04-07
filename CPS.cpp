@@ -147,6 +147,12 @@ string rotated::getPostScript() const
 	return ret;
 }
 
+spacer::spacer(double height, double width)
+{
+	setHeight(height);
+	setWidth(width);
+}
+
 string spacer::getPostScript() const
 {
 	return "";
@@ -178,6 +184,13 @@ string scaled::getPostScript() const
 	ret += _postScript;
 
 	return ret;
+}
+
+circle::circle(double rad)
+{
+	_radius = rad;
+	setWidth(rad*2);
+	setHeight(rad*2);
 }
 
 double circle::getRad() const
@@ -260,6 +273,17 @@ double polygon::calcWidth()
 		return 2*getCircumRad()*sin(theta/2 * PI/180);
 	}
 	
+}
+
+polygon::polygon(double numSides, double sideLength)
+{
+	_numSides = (int)numSides;
+	_sideLength = sideLength;
+	_circumRad = calcCircumRad();	//radius of circle touching each vertex
+	_inRad = calcInRad();	//radius of circle tangent to each side
+	_innerAngle = calcInnerAngle();	//inner angle at each vertex
+	setHeight(calcHeight());
+	setWidth(calcWidth());
 }
 
 double polygon::calcInnerAngle()
@@ -347,6 +371,26 @@ mandelbrot::mandelbrot(int width, int height )
 		
 		}
 	}
+}
+
+string mandelbrot::getPostScript() const
+{
+	return _postScript;
+}
+
+pixel::pixel(double r, double g, double b)
+{
+	//too many squares causes stack overflow
+	//polygon temp(4,2);
+	circle temp(1);
+	_postScript = temp.getPostScript();
+	_postScript += "\n" + to_string(r) + " " + to_string(g) + " " + to_string(b) + " setrgbcolor\n";
+	_postScript += "\nfill\n";
+}
+
+string pixel::getPostScript() const
+{
+	return _postScript;
 }
 
 string vertical::vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset)
