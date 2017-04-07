@@ -46,7 +46,7 @@ public:
 
 	virtual double getHeight() const;
 	virtual double getWidth() const;
-	virtual string getPostScript() const =0;
+	virtual string getPostScript() const = 0;
 	virtual ~shape() = default;				
 };
 
@@ -60,7 +60,7 @@ public:
 
 
 
-// triangle do polygon contrustor but do it for 3 sides 
+// for triangle, do polygon contructor but do it for 3 sides 
 class circle : public shape
 {
 private : 
@@ -68,7 +68,7 @@ private :
 
 public :
 	circle(double rad);
-	
+
 	double getRad() const;
 
 	string getPostScript() const override;
@@ -185,7 +185,7 @@ private:
 
 public:
 
-	scaled(const shape & s, double xScale, double yScale); // takes 2 scales one for x one for y
+	scaled(const shape & s, double xScale, double yScale); // takes 2 scales: one for x, one for y
 
 	string getPostScript() const override;
 

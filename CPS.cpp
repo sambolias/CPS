@@ -213,6 +213,7 @@ double polygon::calcInRad()
 	//inRad ir given sides, and circumRad cr:
 	// ir = cr*cos(pi/n)
 	//in the c'tor, calcCircumRad is called first.
+	//this formula was already in radians
 
 	return getCircumRad()*cos(PI/getNumSides());
 }
@@ -261,7 +262,7 @@ double polygon::calcWidth()
 		return getInRad()*2;
 	}
 
-	else if (n % 2 == 0)	//this also implies n % 4 != 0, because of the order
+	else if (n % 2 == 0)	//also implies n % 4 != 0
 	{
 		return getCircumRad()*2;
 	}
@@ -279,8 +280,8 @@ polygon::polygon(double numSides, double sideLength)
 {
 	_numSides = (int)numSides;
 	_sideLength = sideLength;
-	_circumRad = calcCircumRad();	//radius of circle touching each vertex
-	_inRad = calcInRad();	//radius of circle tangent to each side
+	_circumRad = calcCircumRad();	//radius of circle containing each vertex
+	_inRad = calcInRad();			//radius of circle tangent to each side
 	_innerAngle = calcInnerAngle();	//inner angle at each vertex
 	setHeight(calcHeight());
 	setWidth(calcWidth());
@@ -576,7 +577,7 @@ layered::layered(initializer_list<shared_ptr<shape>> shapes)
 		// this is needed to get a center point from which everything will be drawn around
 		if (getWidth() < i->getWidth())
 		{
-			setWidth(i->getWidth()); // get biggest height to 
+			setWidth(i->getWidth()); // get biggest height too
 		}
 		if (getHeight() < i->getHeight())
 		{
@@ -590,7 +591,6 @@ layered::layered(initializer_list<shared_ptr<shape>> shapes)
 	xCenterCord += 144;
 	double yCenterCord = getHeight() / 2.0;// do this for y cord as well
 	yCenterCord += 144;
-	// TODO find a value where we want to draw the shapes at because right now most are off the page like triangle
 
 	for (int i = 0; i < vecShapes.size(); ++i)
 	{
@@ -636,7 +636,7 @@ void output::addPage(const page &p)
 void output::outputFile(string fname)
 {
 	ofstream ofs(fname);
-	ofs << "%%PS-Adobe-2.0" << "\n"; //
+	ofs << "%%PS-Adobe-2.0" << "\n"; 
 	ofs << "%%Pages: " << pages.size() << "\n"; // sets up amount of pages total
 	ofs<<"%1 \n /inch {72 mul} def \n";
 	int pageNum = 1;
@@ -672,7 +672,7 @@ void testShapes(void)
 	scaled sca(rect, 3, 2);
 	scaled scaCirc(circ1, 2, 1);
 
-	// are scaled and roated shapes showing off
+	// scaled and rotated shapes
 	page scaledRotatedShapes;
 	scaledRotatedShapes.drawTo(rot, 60, 60);
 	scaledRotatedShapes.drawTo(tri, 144, 144);
@@ -686,7 +686,7 @@ void testShapes(void)
 	auto d = make_shared<circle>(20);
 	auto s = make_shared<spacer>(40, 40);
 	auto p = make_shared<polygon>(5, 30);
-	// vertical horizontal and layered objects
+	// vertical, horizontal and layered objects
 	vertical vert{ b,a,c,s,d,p,d };
 	horizontal hor{ b,a,d,p,d };
 	layered l{ a, b, d };
@@ -716,9 +716,9 @@ void testShapes(void)
 	of.outputFile("test.ps");
 }
 
-// this is are testing that we did as we worked through this project
-// Just a history of how we checked values were being correctly performed for functions
-// and classes of our CPS project
+// this is our testing that we did as we worked through this project
+// Just a history of how we were continuously checking that output was 
+// from the functions and classes.
 void developmentTest(void)
 {
 	cout << "//////////" << "\n" << "layered postScript" << endl;
