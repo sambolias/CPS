@@ -175,85 +175,6 @@ string scaled::getPostScript() const
 	return ret;
 }
 
-int main()
-{
-	cout << "//////////" << "\n" << "layered postScript" << endl;
-	auto triLay = make_shared<triangle>(40, 20);
-	auto squareLay = make_shared<square>(20, 20);
-	auto squar = make_shared<square>(20, 20);
-	cout << triLay->getPostScript() ;
-	layered lay{ triLay,squareLay };
-	cout << lay.getPostScript() << endl;
-	cout << "end of layerd input" << endl;
-
-	rectangle rectScale(20, 20);
-	cout << "we are goign to scale this rectangle" << endl;
-	cout << " current dimensions are: " << rectScale.getWidth() << " by " << rectScale.getHeight() << endl;
-	scaled sca(rectScale, 2.0, 1.0);
-
-	cout << "new dimensions are: " << sca.getWidth() << " by " << sca.getHeight() << endl;
-	cout << sca.getPostScript() << endl;
-
-	rectangle rect(40,20);
-	cout<< "rectangle dimensions " <<rect.getWidth() << " by " << rect.getHeight() << endl;
-	cout<< rect.getPostScript() << endl;
-
-	rotated rot(rect, 270);
-
-	cout<< "rotated dimensions " << rot.getWidth() << " by " << rot.getHeight() << endl;
-	cout<< rot.getPostScript() << endl;
-
-	cout<<"Testing vertical stack\n";
-
-	auto a = make_shared<rectangle> (40,20);
-	auto b = make_shared<rotated> (rect, 220);
-	auto c = make_shared<rectangle> (40,20);
-	auto d = make_shared<circle>(20);
-	auto s = make_shared<spacer>(40,40);
-	auto p = make_shared<polygon>(5,30);
-	auto la = make_shared<layered>(initializer_list<shared_ptr<shape>>{a,b,d});
-	auto v2 = make_shared<vertical>(initializer_list<shared_ptr<shape>>{a,b,d,la,p});
-	
-	vertical vert{b,a,c,s,d,p,la};
-	cout<<vert.getPostScript() << endl;
-
-	horizontal hor{b,a,c,d,d,v2};
-
-	layered l{a, b, d};
-
-	pixel pix(.5,.5,.5);
-
-	page test;
-	test.drawTo(pix, 20,20);
-	test.drawTo(rect, 4*72,2*72);
-	test.drawTo(rot, 4*72,4*72);
-	test.drawTo(vert, 2*72, 2*72);
-
-	page test2;
-	test2.drawTo(lay, 4*72, 6*72);
-	test2.drawTo(l, 2*72, 7*72);
-	test2.drawTo(hor, 2*72,4*72);
-	cout<<"\ndraw shapes to page \n";
-	//cout<<test.getPostScript() <<endl;
-
-
-	mandelbrot mandle;
-
-	page test3;
-	test3.drawTo(mandle, 0,0);
-
-	output of;
-	of.addPage(test);
-	of.addPage(test2);
-	of.addPage(test3);
-	cout<<"testing file output \n";
-	of.outputFile("test.ps");
-
-
-
-	return 0;
-}
-
 double circle::getRad() const
 {
 	return _radius;
@@ -598,19 +519,15 @@ layered::layered(initializer_list<shared_ptr<shape>> shapes)
 {
 	for (auto i : shapes) // go through all shapes find newHighest width and height of shapes set it to layered width or height
 	{
-		cout << " new  width of " << i->getWidth() << endl;
-		cout << " new  height of " << i->getHeight() << endl;
 		// get the biggest box made with the height and width of all the shapes
 		// this is needed to get a center point from which everything will be drawn around
 		if (getWidth() < i->getWidth())
 		{
 			setWidth(i->getWidth()); // get biggest height to 
-			cout << " new biggest width of " << i->getWidth() << endl;
 		}
 		if (getHeight() < i->getHeight())
 		{
 			setHeight(i->getHeight());
-			cout << " new biggest height of " << i->getHeight() << endl;
 		}
 		else {} // if not new tallest then go to next one
 	}
@@ -681,4 +598,141 @@ void output::outputFile(string fname)
 	ofs.close();
 }
 
+void testShapes(void)
+{
+	rectangle rec1(30, 20);
+	square sq1(20, 20);
+	circle circ1(20);
+	triangle tri(3, 20);
+	polygon penta(5, 30);
+	//draw all standard shapes
+	page stdShapes;
+	stdShapes.drawTo(rec1, 40, 40);
+	stdShapes.drawTo(sq1, 100, 100);
+	stdShapes.drawTo(circ1, 200, 200);
+	stdShapes.drawTo(tri, 200, 320);
+	stdShapes.drawTo(penta, 144, 144);
 
+	rectangle rect(40, 20);
+	rotated rot(tri, 270);
+	scaled sca(rect, 3, 2);
+	scaled scaCirc(circ1, 2, 1);
+	// are scaled and roated shapes showing off
+	page scaledRotatedShapes;
+	scaledRotatedShapes.drawTo(rot, 60, 60);
+	scaledRotatedShapes.drawTo(tri, 144, 144);
+	scaledRotatedShapes.drawTo(scaCirc, 180, 180);
+
+	auto a = make_shared<rectangle>(40, 20);
+	auto b = make_shared<rotated>(rect, 220);
+	auto c = make_shared<rectangle>(40, 20);
+	auto d = make_shared<circle>(20);
+	auto s = make_shared<spacer>(40, 40);
+	auto p = make_shared<polygon>(5, 30);
+
+	// vertical horizontal and layered objects
+	vertical vert{ b,a,c,s,d,p,b };
+	horizontal hor{ b,a,c,d,d };
+	layered l{ a, b, d };
+	auto triLay = make_shared<triangle>(40, 50);
+	auto squareLay = make_shared<square>(20, 20);
+	auto squar = make_shared<square>(20, 20);
+	layered lay{ triLay,squareLay };
+
+	//page to hold all of our compounded shapes test
+	page compundedShapes;
+	compundedShapes.drawTo(lay, 144, 144);
+	compundedShapes.drawTo(vert, 60, 40);
+	compundedShapes.drawTo(hor, 120, 320);
+
+	output of;
+	of.addPage(stdShapes);
+	of.addPage(scaledRotatedShapes);
+	of.addPage(compundedShapes);
+	of.outputFile("test.ps");
+}
+
+// this is are testing that we did as we worked through this project
+// Just a history of how we checked values were being correctly performed for functions
+// and classes of our CPS project
+void developmentTest(void)
+{
+	cout << "//////////" << "\n" << "layered postScript" << endl;
+	auto triLay = make_shared<triangle>(40, 20);
+	auto squareLay = make_shared<square>(20, 20);
+	auto squar = make_shared<square>(20, 20);
+	cout << triLay->getPostScript();
+	layered lay{ triLay,squareLay };
+	cout << lay.getPostScript() << endl;
+	cout << "end of layerd input" << endl;
+
+	rectangle rectScale(20, 20);
+	cout << "we are goign to scale this rectangle" << endl;
+	cout << " current dimensions are: " << rectScale.getWidth() << " by " << rectScale.getHeight() << endl;
+	scaled sca(rectScale, 2.0, 1.0);
+
+	cout << "new dimensions are: " << sca.getWidth() << " by " << sca.getHeight() << endl;
+	cout << sca.getPostScript() << endl;
+
+	rectangle rect(40, 20);
+	cout << "rectangle dimensions " << rect.getWidth() << " by " << rect.getHeight() << endl;
+	cout << rect.getPostScript() << endl;
+
+	rotated rot(rect, 270);
+
+	cout << "rotated dimensions " << rot.getWidth() << " by " << rot.getHeight() << endl;
+	cout << rot.getPostScript() << endl;
+
+	cout << "Testing vertical stack\n";
+
+	auto a = make_shared<rectangle>(40, 20);
+	auto b = make_shared<rotated>(rect, 220);
+	auto c = make_shared<rectangle>(40, 20);
+	auto d = make_shared<circle>(20);
+	auto s = make_shared<spacer>(40, 40);
+	auto p = make_shared<polygon>(5, 30);
+	auto la = make_shared<layered>(initializer_list<shared_ptr<shape>>{a, b, d});
+	auto v2 = make_shared<vertical>(initializer_list<shared_ptr<shape>>{a, b, d, la, p});
+
+	vertical vert{ b,a,c,s,d,p,la };
+	cout << vert.getPostScript() << endl;
+
+	horizontal hor{ b,a,c,d,d,v2 };
+
+	layered l{ a, b, d };
+
+	pixel pix(.5, .5, .5);
+
+	page test;
+	test.drawTo(pix, 20, 20);
+	test.drawTo(rect, 4 * 72, 2 * 72);
+	test.drawTo(rot, 4 * 72, 4 * 72);
+	test.drawTo(vert, 2 * 72, 2 * 72);
+
+	page test2;
+	test2.drawTo(lay, 4 * 72, 6 * 72);
+	test2.drawTo(l, 2 * 72, 7 * 72);
+	test2.drawTo(hor, 2 * 72, 4 * 72);
+	cout << "\ndraw shapes to page \n";
+	//cout<<test.getPostScript() <<endl;
+
+
+	mandelbrot mandle;
+
+	page test3;
+	test3.drawTo(mandle, 0, 0);
+
+	output of;
+	of.addPage(test);
+	of.addPage(test2);
+	of.addPage(test3);
+	cout << "testing file output \n";
+	of.outputFile("test.ps");
+}
+
+int main()
+{
+	testShapes();
+	//developmentTest();
+	return 0;
+}
