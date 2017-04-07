@@ -229,7 +229,7 @@ double polygon::calcWidth()
 	//for the odds, the width is the chord of the circular segment 
 	//between (n+1)/2 vertices. The angle for this segment is that
 	//number-1 sides times 360/n (the angle subtending a side)
-	// chord length = 2*cr*sin(360/n*(numVertices-1)) = width
+	// chord length = 2*cr*sin(360/n*(numVertices-1)/2) = width
 
 	int n = getNumSides();
 
@@ -252,7 +252,7 @@ double polygon::calcWidth()
 	{
 		int numVertices = (n + 1)/2;
 		double theta = 360/n * (numVertices-1);
-		return 2*getCircumRad()*sin(theta * PI/180);
+		return 2*getCircumRad()*sin(theta/2 * PI/180);
 	}
 	
 }
@@ -635,7 +635,7 @@ void testShapes(void)
 	auto p = make_shared<polygon>(5, 30);
 	// vertical horizontal and layered objects
 	vertical vert{ b,a,c,s,d,p,d };
-	horizontal hor{ b,a,c,d,d };
+	horizontal hor{ b,a,d,p,d };
 	layered l{ a, b, d };
 	auto triLay = make_shared<triangle>(40, 50);
 	auto squareLay = make_shared<square>(20, 20);
