@@ -187,16 +187,16 @@ double polygon::calcCircumRad()
 	//because we know L and n, solve that equation for cr: 
 	// cr = L/(2*sin(180/n))
 
-	return getSideLength() / (2*sin(PI/getNumSides()));
+	return getSideLength() / (2*sin(180/getNumSides() * PI/180));
 }
 
 double polygon::calcInRad()
 {
 	//inRad ir given sides, and circumRad cr:
-	// ir = cr*sin(pi/n)
+	// ir = cr*cos(pi/n)
 	//in the c'tor, calcCircumRad is called first.
 
-	return getCircumRad()*sin(PI/getNumSides());
+	return getCircumRad()*cos(PI/getNumSides() * PI/180);
 }
 
 double polygon::calcHeight()
@@ -633,7 +633,6 @@ void testShapes(void)
 	auto d = make_shared<circle>(20);
 	auto s = make_shared<spacer>(40, 40);
 	auto p = make_shared<polygon>(5, 30);
-
 	// vertical horizontal and layered objects
 	vertical vert{ b,a,c,s,d,p,d };
 	horizontal hor{ b,a,c,d,d };
