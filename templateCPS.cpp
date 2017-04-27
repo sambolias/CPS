@@ -47,8 +47,8 @@ T::T stackHorVert(initializer_list<shared_ptr<shape>> shapes, char type)
 	//layered
 	if(type == "l") // layered postscript find the middle
 	{
-		double xCenterCord = layWidth / 2.0; // we only need to go half way to reach the edge since were in the center
-		double yCenterCord = layHeight / 2.0;// do this for y cord as well
+		double xCenterCord = maxWidth / 2.0; // we only need to go half way to reach the edge since were in the center
+		double yCenterCord = maxHeight / 2.0;// do this for y cord as well
 		for (int i = 0; i < vecShapes.size(); ++i)
 		{
 		yCenterCord -= vecShapes[i]->getHeight() / 2.0;
