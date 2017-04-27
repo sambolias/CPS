@@ -1,5 +1,21 @@
 #include "cps.h"
+/*
+	description of what I did
+	took the variables of maxHeight and maxWidht
+	sumWidht... etc and put them into the begining of the funciton to
+	assign them their proper values then found the sum and max heights and widths
+	that I would need later on. Layered really find its new center with 
+	layWidth and layHeight and draw like usual
 
+	for horizontal and vertical i split it up into even and odd for the first if conditions
+	then inside of even I ran through the for loop like we did for vertical and horizontal stack
+	but as i assigned new variable i did a check to see what type we had and then acted accordingly
+
+	Last was the odd and I used the functions we had previous for stackingOdd vertically and horizontally
+	but since I ordered them already I could send them off after a quick type check and set postcript variable equal
+	to what is returned from those functions following that the last line i set the private data member of shape of 
+	_postscript = postscript
+*/
 template<class T>//h == horizontal v == vertical l == layered
 T::T stackHorVert(initializer_list<shared_ptr<shape>> shapes, char type)
 {
