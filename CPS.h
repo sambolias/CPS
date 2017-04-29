@@ -1,6 +1,11 @@
 #ifndef CPS_H_INCLUDED
 #define CPS_H_INCLUDED
 
+//Sam Erie
+//CS 372
+//HW 4
+//Template Design Pattern
+
 #include <cmath>
 using std::sin;
 using std::cos;
