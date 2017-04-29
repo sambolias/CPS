@@ -45,6 +45,16 @@ protected:
 	void setHeight(double height);
 	void setWidth(double width);
 	string draw(const shape &s, int x, int y);
+
+	//For Compound Shapes -- Template Pattern
+	virtual void setOffset(shared_ptr<shape> s, int &x, int &y, int &offset, int &step){};
+	double getMaxHeight(initializer_list<shared_ptr<shape>> shapes);
+	double getMaxWidth(initializer_list<shared_ptr<shape>> shapes);
+	double getSumHeight(initializer_list<shared_ptr<shape>> shapes);
+	double getSumWidth(initializer_list<shared_ptr<shape>> shapes);
+
+	string Stack(const vector<shared_ptr<shape>> &shapes, int offset);
+	///////////////////////////////////////////////////////////////
 	//this function is global, won't compile as member function
 	//void findAndReplace(string & s, string && find, string && replace);
 public:
@@ -201,7 +211,7 @@ class vertical : public shape
 private:
 
 	string _postScript;
-	string vertStackOdd(const vector<shared_ptr<shape>> &shapes, int offset);
+	void setOffset(shared_ptr<shape> s, int &x, int &y, int &offset, int &step) override;
 public:
 
 	vertical(initializer_list<shared_ptr<shape>> shapes);
@@ -216,7 +226,7 @@ class horizontal : public shape
 private:
 
 	string _postScript;
-	string horStackOdd(const vector<shared_ptr<shape>> &shapes, int offset);
+	void setOffset(shared_ptr<shape> s, int &x, int &y, int &offset, int &step) override;
 public:
 
 	horizontal(initializer_list<shared_ptr<shape>> shapes);
@@ -229,6 +239,7 @@ class layered : public shape
 {
 private:
 	string _postScript;
+	void setOffset(shared_ptr<shape> s, int &x, int &y, int &offset, int &step) override;
 public:
 	layered(initializer_list<shared_ptr<shape>> shapes);
 	
